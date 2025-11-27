@@ -35,3 +35,4 @@ A modern, responsive landing page built to showcase Himalaya Lip Balm products. 
 └── README.md
 
 🚀 Live Demo
+himalaya-lipbalm-showcase.vercel.app
