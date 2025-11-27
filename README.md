@@ -1,72 +1,37 @@
-🌿 Himalaya Lip Balm — Product Showcase
-A modern, responsive product showcase website for Himalaya Lip Balm, built using HTML, CSS, JavaScript, and a Flask + MySQL backend for handling contact form submissions.
+# 🌐 Himalaya Lip Balm Showcase
 
+A modern, responsive landing page built to showcase Himalaya Lip Balm products. This project demonstrates clean HTML, CSS, and JavaScript integration for interactive sections such as hero, benefits, ingredients, reviews, and contact forms.
 
-🚀 Features
-----------------------------------------------------------------------------
-• 🌸 Animated Scroll Effects (AOS) for smooth fade and zoom transitions.
-• 🛒 Cart Drawer with Add to Cart, Quantity Update, and Checkout animation.
-• 💬 Contact Form integrated with Flask backend and MySQL database.
-• 🔝 Back to Top Button for better user experience.
-• ⭐ Customer Reviews with “Show More” toggle animation.
-• 📱 Fully Responsive design optimized for mobile and desktop screens.
-• 🎨 Modern UI built with clean and reusable CSS components.
+## ✨ Features
 
+- **Responsive Design:** Optimized for mobile, tablet, and desktop screens.
+- **Hero Section:** Eye-catching product display with call-to-action buttons.
+- **Benefits & Ingredients Sections:** Showcases product advantages and key ingredients.
+- **Reviews Section:** Interactive customer review display with “Show More” functionality.
+- **Contact Form:** Fully functional form with popup success message.
+- **Reusable Components:** Modular JS files for maintainability and scalability.
+- **Smooth Animations:** Subtle hover effects and transitions for better user experience.
 
+## 🛠️ Technologies Used
 
-🧩 Tech Stack
+- HTML5
+- CSS3 (Flexbox, Grid, Transitions)
+- JavaScript (ES6)
+- Git & GitHub for version control
 
-|     Layer      |            Technologies                 |
-|----------------|-----------------------------------------|
-| **Frontend**   | HTML5, CSS3, JavaScript (modular files) |
-| **Animations** | AOS (Animate On Scroll)                 |
-| **Backend**    | Flask (Python)                          |
-| **Database**   | MySQL                                   |
-| **Icons**      | Font Awesome                            |
+## 📁 Folder Structure
 
+├── index.html
+├── css/
+│ └── style.css
+├── js/
+│ ├── hero.js
+│ ├── benefits.js
+│ ├── ingredients.js
+│ ├── reviews.js
+│ ├── contact.js
+│ └── main.js
+├── images/
+└── README.md
 
-📂 Project Structure
-
-project/
-│
-├── static/
-│   ├── Assets/
-│   │   ├── hero.png
-│   │   ├── logo.webp
-│   │   └── (other images)
-│   │
-│   ├── js/
-│   │   ├── aos-init.js
-│   │   ├── navigation.js
-│   │   ├── reviews.js
-│   │   ├── backtotop.js
-│   │   ├── cart.js
-│   │   └── contact.js
-│   │
-│   └── style.css
-│
-├── templates/
-│   └── index.html
-│
-├── app.py
-└── requirements.txt
-
-
-⚙️ Setup Instructions
-1️⃣ Install Dependencies
-Make sure Python and pip are installed. Then, install Flask and MySQL connector:
-          pip install flask flask-mysqldb
-
-2️⃣ Run Flask App
-In your terminal:
-python app.py
-
-Then open your browser and visit:
-👉 http://127.0.0.1:5000/
-
-
-🧠 Notes
-
-• All JavaScript files are now modularized in the /static/js/ folder.
-• Each script is linked in the <head> with the defer keyword to ensure they run after the DOM loads.
-• Contact form requires a working Flask route (/contact) to handle submissions.
+🚀 Live Demo
