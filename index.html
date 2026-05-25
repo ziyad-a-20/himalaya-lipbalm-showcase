@@ -1,321 +1,813 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content="Himalaya Lip Balm — natural lip care with nourishing oils. Discover benefits, ingredients, and customer reviews.">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Himalaya Lip Balm — Premium natural lip care with cold-pressed botanical oils. Discover benefits, ingredients, and honest customer reviews." />
+  <title>Himalaya Lip Care — Natural Lip Balm</title>
 
-    <title>Himalaya Lip Balm — Showcase</title>
+  <!-- Favicons -->
+  <link rel="apple-touch-icon" sizes="180x180" href="Assets/favicons/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="Assets/favicons/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="Assets/favicons/favicon-16x16.png" />
+  <link rel="shortcut icon" href="Assets/favicons/favicon.ico" />
+  <link rel="manifest" href="site.webmanifest" />
 
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet"/>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+  <!-- Open Graph / Social Preview -->
+  <meta property="og:type"         content="website" />
+  <meta property="og:url"          content="https://himalaya-lip-care.vercel.app/" />
+  <meta property="og:title"        content="Himalaya Lip Care — Natural Lip Balm" />
+  <meta property="og:description"  content="A luxurious blend of cold-pressed botanical oils — soothing dryness, sealing in moisture, and protecting your lips through every season." />
+  <meta property="og:image"        content="https://himalaya-lip-care.vercel.app/Assets/favicons/android-chrome-512x512.png" />
+  <meta property="og:image:width"  content="512" />
+  <meta property="og:image:height" content="512" />
+  <meta property="og:locale"       content="en_IN" />
 
-    <link rel="stylesheet" href="style.css"/>
+  <!-- Twitter / X Card -->
+  <meta name="twitter:card"        content="summary" />
+  <meta name="twitter:title"       content="Himalaya Lip Care — Natural Lip Balm" />
+  <meta name="twitter:description" content="Premium natural lip care with cold-pressed botanical oils. Dermatologist-tested, PETA certified." />
+  <meta name="twitter:image"       content="https://himalaya-lip-care.vercel.app/Assets/favicons/android-chrome-512x512.png" />
 
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <script src="aos-init.js" defer></script>
-    <script src="backtotop.js" defer></script>
-    <script src="cart.js" defer></script>
-    <script src="navigation.js" defer></script>
-    <script src="reviews.js" defer></script>
-    <script src="contact.js" defer></script>
-    
-  </head>
-<body>
-    <!-- NAV -->
-    <header class="nav container">
-      <div class="brand">
-        <div class="logo">
-          <img src="Assets/logo.webp" alt="Himalaya Lip Care Logo" loading="lazy" />
+  <!-- Theme colour -->
+  <meta name="theme-color" content="#2a8c6e" />
+
+
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="loading">
+
+  <!-- PAGE LOADER -->
+  <div class="page-loader" id="pageLoader">
+    <div class="loader-inner">
+      <div class="loader-leaf-wrap">
+        <svg class="loader-leaf-svg" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Leaf outline path - drawn via stroke-dashoffset animation -->
+          <path class="leaf-path"
+            d="M60 10 C60 10, 100 30, 100 65 C100 90, 82 108, 60 110 C38 108, 20 90, 20 65 C20 30, 60 10, 60 10 Z"
+            stroke="#2a8c6e" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          <!-- Centre vein -->
+          <path class="vein-path"
+            d="M60 10 L60 110"
+            stroke="#2a8c6e" stroke-width="1.5" fill="none" stroke-linecap="round" opacity="0.5"/>
+          <!-- Side veins left -->
+          <path class="vein-side v1"
+            d="M60 40 C50 45, 32 52, 28 62"
+            stroke="#2a8c6e" stroke-width="1.2" fill="none" stroke-linecap="round" opacity="0.4"/>
+          <path class="vein-side v2"
+            d="M60 58 C48 62, 30 68, 26 78"
+            stroke="#2a8c6e" stroke-width="1.2" fill="none" stroke-linecap="round" opacity="0.4"/>
+          <!-- Side veins right -->
+          <path class="vein-side v3"
+            d="M60 40 C70 45, 88 52, 92 62"
+            stroke="#2a8c6e" stroke-width="1.2" fill="none" stroke-linecap="round" opacity="0.4"/>
+          <path class="vein-side v4"
+            d="M60 58 C72 62, 90 68, 94 78"
+            stroke="#2a8c6e" stroke-width="1.2" fill="none" stroke-linecap="round" opacity="0.4"/>
+          <!-- Leaf fill - fades in after draw -->
+          <path class="leaf-fill"
+            d="M60 10 C60 10, 100 30, 100 65 C100 90, 82 108, 60 110 C38 108, 20 90, 20 65 C20 30, 60 10, 60 10 Z"
+            fill="#2a8c6e" opacity="0"/>
+        </svg>
+        <div class="loader-drop drop1"></div>
+        <div class="loader-drop drop2"></div>
+        <div class="loader-drop drop3"></div>
+      </div>
+      <div class="loader-text-wrap">
+        <span class="loader-wordmark">Himalaya</span>
+        <span class="loader-tagline">Lip Care</span>
+      </div>
+      <div class="loader-progress"><div class="loader-progress-fill"></div></div>
+    </div>
+  </div>
+
+  <!-- PROMO BANNER -->
+  <div class="promo-banner" id="promoBanner">
+    <div class="promo-marquee">
+      <span>
+        <i class="fa-solid fa-leaf"></i>&nbsp; Free shipping on orders above ₹200
+        &nbsp;·&nbsp; Use code <strong>NATURE10</strong> for 10% off your first order
+        &nbsp;·&nbsp; <i class="fa-solid fa-leaf"></i>&nbsp; Free shipping on orders above ₹200
+        &nbsp;·&nbsp; Use code <strong>NATURE10</strong> for 10% off your first order &nbsp;·&nbsp;
+      </span>
+    </div>
+    <button class="promo-close" id="promoClose" aria-label="Close banner">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+  </div>
+
+  <!-- NAVBAR -->
+  <header class="navbar" id="navbar">
+    <div class="nav-inner">
+      <a class="brand" href="#home">
+        <div class="brand-logo">
+          <img src="Assets/logo.webp" alt="Himalaya Lip Care logo" loading="lazy" />
+        </div>
+        <div class="brand-text">
+          <span class="brand-name">Himalaya</span>
+          <span class="brand-sub">Lip Care</span>
+        </div>
+      </a>
+
+      <nav class="nav-links" id="navLinks">
+        <a href="#about"><i class="fa-solid fa-leaf"></i> About</a>
+        <a href="#benefits"><i class="fa-solid fa-star"></i> Benefits</a>
+        <a href="#ingredients"><i class="fa-solid fa-seedling"></i> Ingredients</a>
+        <a href="#reviews"><i class="fa-solid fa-comment-dots"></i> Reviews</a>
+        <a href="#faq"><i class="fa-solid fa-circle-question"></i> FAQ</a>
+        <a href="#contact"><i class="fa-solid fa-envelope"></i> Contact</a>
+      </nav>
+
+      <div class="nav-actions">
+        <button class="wishlist-nav-btn" id="wishlistNavBtn" aria-label="Wishlist">
+          <i class="fa-regular fa-heart" id="wishlistNavIcon"></i>
+        </button>
+        <button class="cart-toggle-btn" id="cartToggle" aria-label="Open cart">
+          <i class="fa-solid fa-bag-shopping"></i>
+          <span class="cart-badge" id="cartBadge">0</span>
+        </button>
+        <button class="hamburger" id="hamburger" aria-label="Toggle navigation">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero" id="home">
+    <div class="hero-bg-orb orb1"></div>
+    <div class="hero-bg-orb orb2"></div>
+    <div class="hero-bg-orb orb3"></div>
+
+    <div class="hero-container">
+      <div class="hero-left" data-aos="fade-right" data-aos-duration="1000">
+        <div class="hero-eyebrow">
+          <i class="fa-solid fa-circle-check"></i>
+          <span>Dermatologically Tested</span>
+        </div>
+
+        <h1 class="hero-title">
+          Nature's Touch<br />
+          <em>For Softer Lips</em>
+        </h1>
+
+        <p class="hero-desc">
+          A luxurious blend of cold-pressed botanical oils — soothing dryness, sealing in moisture, and protecting your lips through every season.
+        </p>
+
+        <div class="hero-tags">
+          <span><i class="fa-solid fa-droplet"></i> Deep Hydration</span>
+          <span><i class="fa-solid fa-shield-halved"></i> UV Protection</span>
+          <span><i class="fa-brands fa-pagelines"></i> 100% Natural</span>
+        </div>
+
+        <div class="hero-cta">
+          <button class="btn btn-primary add-to-cart">
+            <i class="fa-solid fa-bag-shopping"></i> Add to Cart — ₹50
+          </button>
+          <button class="btn btn-ghost learn-more-btn">
+            <i class="fa-solid fa-play"></i> Learn More
+          </button>
+          <button class="wishlist-btn" id="wishlistBtn" aria-label="Add to wishlist">
+            <i class="fa-regular fa-heart" id="wishlistBtnIcon"></i>
+          </button>
+        </div>
+
+        <div class="hero-trust">
+          <div class="trust-item"><i class="fa-solid fa-award"></i><span>PETA Certified</span></div>
+          <div class="trust-sep"></div>
+          <div class="trust-item"><i class="fa-solid fa-flask"></i><span>Lab Tested</span></div>
+          <div class="trust-sep"></div>
+          <div class="trust-item"><i class="fa-solid fa-weight-scale"></i><span>Net Wt. 10 g</span></div>
+        </div>
+      </div>
+
+      <div class="hero-right" data-aos="zoom-in" data-aos-duration="1100" data-aos-delay="200">
+        <div class="product-showcase">
+          <div class="product-glow"></div>
+          <div class="product-ring ring1"></div>
+          <div class="product-ring ring2"></div>
+          <div class="product-glass-card">
+            <img src="Assets/hero.png" alt="Himalaya Lip Balm tube" class="product-img lazy-img"
+                 data-src="Assets/hero.png" />
+          </div>
+          <div class="product-float-badge badge-top">
+            <i class="fa-solid fa-star"></i> 4.3 Rating
+          </div>
+          <div class="product-float-badge badge-bottom">
+            <i class="fa-solid fa-users"></i> 86+ Reviews
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-scroll-hint">
+      <span>Scroll to explore</span>
+      <div class="scroll-line"></div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section class="about" id="about">
+    <div class="about-container">
+      <div class="about-img-wrap" data-aos="fade-right" data-aos-duration="900">
+        <div class="about-img-frame">
+          <img src="Assets/about.jpeg" alt="Himalaya Lip Balm product" class="lazy-img" data-src="Assets/about.jpeg" loading="lazy" />
+        </div>
+        <div class="about-img-card">
+          <i class="fa-solid fa-award"></i>
+          <div><strong>Trusted Since 1930</strong><span>Over 90 years of natural care</span></div>
+        </div>
+      </div>
+
+      <div class="about-content" data-aos="fade-left" data-aos-duration="900" data-aos-delay="150">
+        <div class="section-label"><i class="fa-solid fa-circle-info"></i> About the Product</div>
+        <h2 class="section-title">Crafted with<br /><em>Pure Botanicals</em></h2>
+        <p class="about-desc">
+          Made with the finest cold-pressed oils and Himalayan plant extracts, this lip balm is lightweight, non-greasy, and gentle enough for everyday use. It restores softness, seals in moisture, and protects lips naturally — with every single application.
+        </p>
+        <ul class="about-list">
+          <li>
+            <span class="list-icon"><i class="fa-solid fa-check"></i></span>
+            <div>
+              <strong>Up to 8 Hours of Hydration</strong>
+              <p>Keeps lips visibly soft and moisturised throughout the day</p>
+            </div>
+          </li>
+          <li>
+            <span class="list-icon"><i class="fa-solid fa-check"></i></span>
+            <div>
+              <strong>Clean, Natural Formula</strong>
+              <p>Free from parabens, sulphates, and artificial fragrances</p>
+            </div>
+          </li>
+          <li>
+            <span class="list-icon"><i class="fa-solid fa-check"></i></span>
+            <div>
+              <strong>Safe for All Skin Types</strong>
+              <p>PETA-certified and dermatologist-tested, including for sensitive skin</p>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- BENEFITS -->
+  <section class="benefits" id="benefits">
+    <div class="benefits-container">
+      <div class="section-header" data-aos="fade-up">
+        <div class="section-label"><i class="fa-solid fa-sparkles"></i> Why Choose Us</div>
+        <h2 class="section-title">Key <em>Benefits</em></h2>
+        <p class="section-sub">What makes this lip balm a daily essential for thousands of people</p>
+      </div>
+
+      <div class="benefit-grid">
+        <div class="benefit-card" data-aos="fade-up" data-aos-delay="0">
+          <div class="benefit-img-wrap">
+            <img src="Assets/benefit1.webp" alt="Intense hydration" class="lazy-img" data-src="Assets/benefit1.webp" loading="lazy" />
+            <div class="benefit-img-overlay"></div>
+          </div>
+          <div class="benefit-body">
+            <div class="benefit-num">01</div>
+            <h3>Intense Hydration</h3>
+            <p>Deeply moisturises and forms a protective seal that locks in hydration, keeping lips supple for hours.</p>
+          </div>
+        </div>
+
+        <div class="benefit-card" data-aos="fade-up" data-aos-delay="100">
+          <div class="benefit-img-wrap">
+            <img src="Assets/benefit2.jpg" alt="Natural nourishment" class="lazy-img" data-src="Assets/benefit2.jpg" loading="lazy" />
+            <div class="benefit-img-overlay"></div>
+          </div>
+          <div class="benefit-body">
+            <div class="benefit-num">02</div>
+            <h3>Natural Nourishment</h3>
+            <p>Cold-pressed botanical oils penetrate deep to restore dry, chapped lips and rebuild their natural softness.</p>
+          </div>
+        </div>
+
+        <div class="benefit-card" data-aos="fade-up" data-aos-delay="200">
+          <div class="benefit-img-wrap">
+            <img src="Assets/benefit3.jpeg" alt="All-day protection" class="lazy-img" data-src="Assets/benefit3.jpeg" loading="lazy" />
+            <div class="benefit-img-overlay"></div>
+          </div>
+          <div class="benefit-body">
+            <div class="benefit-num">03</div>
+            <h3>All-Day Protection</h3>
+            <p>Creates a gentle barrier against wind, UV exposure, and environmental stress — from morning to night.</p>
+          </div>
+        </div>
+
+        <div class="benefit-card" data-aos="fade-up" data-aos-delay="300">
+          <div class="benefit-img-wrap">
+            <img src="Assets/benefit4.jpeg" alt="Gentle for all skin types" class="lazy-img" data-src="Assets/benefit4.jpeg" loading="lazy" />
+            <div class="benefit-img-overlay"></div>
+          </div>
+          <div class="benefit-body">
+            <div class="benefit-num">04</div>
+            <h3>Gentle for Everyone</h3>
+            <p>A hypoallergenic, fragrance-light formula that's safe for all ages — including the most sensitive skin.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- INGREDIENTS -->
+  <section class="ingredients" id="ingredients">
+    <div class="ingredients-container">
+      <div class="section-header" data-aos="fade-up">
+        <div class="section-label"><i class="fa-solid fa-seedling"></i> What's Inside</div>
+        <h2 class="section-title">Key <em>Ingredients</em></h2>
+        <p class="section-sub">Carefully sourced from nature, formulated with science</p>
+      </div>
+
+      <div class="ingredient-grid">
+        <div class="ingredient-card" data-aos="zoom-in" data-aos-delay="0">
+          <div class="ingredient-img-wrap">
+            <img src="Assets/carrot-oil.jpeg" alt="Carrot Seed Oil" class="lazy-img" data-src="Assets/carrot-oil.jpeg" loading="lazy" />
+            <div class="ingredient-overlay"><i class="fa-solid fa-circle-info"></i></div>
+          </div>
+          <div class="ingredient-body">
+            <div class="ingredient-num">01</div>
+            <h3>Carrot Seed Oil</h3>
+            <p>Packed with antioxidants and vitamins A, C &amp; E to rejuvenate and repair dry, dull lips.</p>
+            <div class="ingredient-tags"><span>Antioxidant</span><span>Vitamin-rich</span></div>
+          </div>
+        </div>
+
+        <div class="ingredient-card" data-aos="zoom-in" data-aos-delay="80">
+          <div class="ingredient-img-wrap">
+            <img src="Assets/castor-oil.jpeg" alt="Castor Oil" class="lazy-img" data-src="Assets/castor-oil.jpeg" loading="lazy" />
+            <div class="ingredient-overlay"><i class="fa-solid fa-circle-info"></i></div>
+          </div>
+          <div class="ingredient-body">
+            <div class="ingredient-num">02</div>
+            <h3>Castor Oil</h3>
+            <p>A deeply conditioning emollient that locks in moisture and delivers long-lasting softness.</p>
+            <div class="ingredient-tags"><span>Conditioning</span><span>Moisturising</span></div>
+          </div>
+        </div>
+
+        <div class="ingredient-card" data-aos="zoom-in" data-aos-delay="160">
+          <div class="ingredient-img-wrap">
+            <img src="Assets/coco-oil.jpeg" alt="Coconut Oil" class="lazy-img" data-src="Assets/coco-oil.jpeg" loading="lazy" />
+            <div class="ingredient-overlay"><i class="fa-solid fa-circle-info"></i></div>
+          </div>
+          <div class="ingredient-body">
+            <div class="ingredient-num">03</div>
+            <h3>Coconut Oil</h3>
+            <p>A lightweight, fast-absorbing oil that calms, soothes, and shields delicate lip skin.</p>
+            <div class="ingredient-tags"><span>Soothing</span><span>Protective</span></div>
+          </div>
+        </div>
+
+        <div class="ingredient-card" data-aos="zoom-in" data-aos-delay="240">
+          <div class="ingredient-img-wrap">
+            <img src="Assets/wheat-germ-oil.jpeg" alt="Wheat Germ Oil" class="lazy-img" data-src="Assets/wheat-germ-oil.jpeg" loading="lazy" />
+            <div class="ingredient-overlay"><i class="fa-solid fa-circle-info"></i></div>
+          </div>
+          <div class="ingredient-body">
+            <div class="ingredient-num">04</div>
+            <h3>Wheat Germ Oil</h3>
+            <p>High in vitamin E and fatty acids that accelerate skin repair and restore natural smoothness.</p>
+            <div class="ingredient-tags"><span>Repairing</span><span>Softening</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMPARISON TABLE -->
+  <section class="comparison" id="comparison">
+    <div class="comparison-container">
+      <div class="section-header" data-aos="fade-up">
+        <div class="section-label"><i class="fa-solid fa-scale-balanced"></i> Side by Side</div>
+        <h2 class="section-title">Himalaya vs <em>Chemical Balms</em></h2>
+        <p class="section-sub">A clear look at why natural beats synthetic — every time</p>
+      </div>
+
+      <div class="comparison-wrap" data-aos="fade-up" data-aos-delay="100">
+        <div class="comparison-scroll">
+          <table class="comparison-table">
+            <thead>
+              <tr>
+                <th class="feature-col">Feature</th>
+                <th class="himalaya-col">
+                  <div class="th-brand"><i class="fa-solid fa-leaf"></i> Himalaya</div>
+                </th>
+                <th class="other-col">Chemical Balms</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr data-aos="fade-up" data-aos-delay="0" data-aos-duration="700">
+                <td>Formula</td>
+                <td class="himalaya-col"><i class="fa-solid fa-circle-check c-yes"></i> 100% Natural Botanical Extracts</td>
+                <td><i class="fa-solid fa-circle-xmark c-no"></i> Synthetic &amp; Petroleum-Based</td>
+              </tr>
+              <tr data-aos="fade-up" data-aos-delay="80" data-aos-duration="700">
+                <td>Moisture Duration</td>
+                <td class="himalaya-col"><i class="fa-solid fa-circle-check c-yes"></i> Up to 8 Hours</td>
+                <td><i class="fa-solid fa-circle-xmark c-no"></i> 2–3 Hours Only</td>
+              </tr>
+              <tr data-aos="fade-up" data-aos-delay="160" data-aos-duration="700">
+                <td>Skin Safety</td>
+                <td class="himalaya-col"><i class="fa-solid fa-circle-check c-yes"></i> Dermatologist Tested</td>
+                <td><i class="fa-solid fa-circle-xmark c-no"></i> May Cause Irritation</td>
+              </tr>
+              <tr data-aos="fade-up" data-aos-delay="240" data-aos-duration="700">
+                <td>Parabens &amp; Sulphates</td>
+                <td class="himalaya-col"><i class="fa-solid fa-circle-check c-yes"></i> Completely Free</td>
+                <td><i class="fa-solid fa-circle-xmark c-no"></i> Frequently Present</td>
+              </tr>
+              <tr data-aos="fade-up" data-aos-delay="320" data-aos-duration="700">
+                <td>Animal Testing</td>
+                <td class="himalaya-col"><i class="fa-solid fa-circle-check c-yes"></i> PETA Certified Cruelty-Free</td>
+                <td><i class="fa-solid fa-circle-xmark c-no"></i> Not Always Certified</td>
+              </tr>
+              <tr data-aos="fade-up" data-aos-delay="400" data-aos-duration="700">
+                <td>Suitable For</td>
+                <td class="himalaya-col"><i class="fa-solid fa-circle-check c-yes"></i> All Ages &amp; Skin Types</td>
+                <td><i class="fa-solid fa-circle-xmark c-no"></i> Limited Compatibility</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- REVIEWS -->
+  <section class="reviews" id="reviews">
+    <div class="reviews-container">
+      <div class="reviews-header" data-aos="fade-up">
+        <div class="reviews-left">
+          <div class="section-label"><i class="fa-solid fa-comment-dots"></i> Customer Reviews</div>
+          <h2 class="section-title">Real Results,<br /><em>Real People</em></h2>
+        </div>
+        <div class="reviews-score">
+          <div class="score-number" id="scoreCount">0</div>
+          <div class="score-meta">
+            <div class="stars-row">
+              <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+              <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+              <i class="fa-regular fa-star-half-stroke"></i>
+            </div>
+            <span>Based on 86 verified reviews</span>
+            <div class="rating-bars">
+              <div class="rating-bar-row"><span class="bar-label">5★</span><div class="bar-track"><div class="bar-fill" data-width="58%"></div></div><span class="bar-pct">58%</span></div>
+              <div class="rating-bar-row"><span class="bar-label">4★</span><div class="bar-track"><div class="bar-fill" data-width="24%"></div></div><span class="bar-pct">24%</span></div>
+              <div class="rating-bar-row"><span class="bar-label">3★</span><div class="bar-track"><div class="bar-fill" data-width="10%"></div></div><span class="bar-pct">10%</span></div>
+              <div class="rating-bar-row"><span class="bar-label">2★</span><div class="bar-track"><div class="bar-fill" data-width="5%"></div></div><span class="bar-pct">5%</span></div>
+              <div class="rating-bar-row"><span class="bar-label">1★</span><div class="bar-track"><div class="bar-fill" data-width="3%"></div></div><span class="bar-pct">3%</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="review-grid">
+
+        <div class="review-card review-card--featured" data-aos="fade-up" data-aos-delay="0">
+          <div class="review-top">
+            <div class="review-avatar" style="--av-bg:#e9f7f2;--av-color:#2f8f6d">S</div>
+            <div>
+              <h5>Shraddha K. <span class="verified-badge"><i class="fa-solid fa-circle-check"></i> Verified</span></h5>
+              <div class="review-stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+            </div>
+            <span class="review-date">2 weeks ago</span>
+          </div>
+          <p>"I've tried everything — from expensive department-store balms to pharmacy staples — and nothing compares. My lips used to peel every single morning. After just two weeks of using this each night, they feel genuinely healed. The texture is so light it disappears on contact — not waxy, not heavy. Just soft."</p>
+          <div class="review-helpful"><i class="fa-regular fa-thumbs-up"></i> 42 people found this helpful</div>
+        </div>
+
+        <div class="review-card" data-aos="fade-up" data-aos-delay="100">
+          <div class="review-top">
+            <div class="review-avatar" style="--av-bg:#f6f0ff;--av-color:#6b3aa6">M</div>
+            <div>
+              <h5>Monik Gandhi <span class="verified-badge"><i class="fa-solid fa-circle-check"></i> Verified</span></h5>
+              <div class="review-stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-regular fa-star"></i></div>
+            </div>
+            <span class="review-date">1 month ago</span>
+          </div>
+          <p>"The scent is clean and barely-there — nothing artificial. Apply it before bed and wake up to noticeably smoother lips. The non-greasy finish makes it perfect under lipstick too."</p>
+          <div class="review-helpful"><i class="fa-regular fa-thumbs-up"></i> 28 people found this helpful</div>
+        </div>
+
+        <div class="review-card" data-aos="fade-up" data-aos-delay="200">
+          <div class="review-top">
+            <div class="review-avatar" style="--av-bg:#fff6ea;--av-color:#e07a1f">A</div>
+            <div>
+              <h5>Anita P. <span class="verified-badge"><i class="fa-solid fa-circle-check"></i> Verified</span></h5>
+              <div class="review-stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+            </div>
+            <span class="review-date">3 weeks ago</span>
+          </div>
+          <p>"Delhi winters are brutal on lips — I was going through a tube every two weeks. This one actually heals the cracks overnight. It's now the only thing on my bedside table."</p>
+          <div class="review-helpful"><i class="fa-regular fa-thumbs-up"></i> 19 people found this helpful</div>
+        </div>
+
+        <div class="review-card hidden-review">
+          <div class="review-top">
+            <div class="review-avatar" style="--av-bg:#e8f8ff;--av-color:#0b6b8c">R</div>
+            <div>
+              <h5>Rohit S. <span class="verified-badge"><i class="fa-solid fa-circle-check"></i> Verified</span></h5>
+              <div class="review-stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-regular fa-star"></i></div>
+            </div>
+            <span class="review-date">6 weeks ago</span>
+          </div>
+          <p>"Picked this up on a whim for ₹50. Packaging feels premium, it stays put, and my girlfriend noticed my lips looked better before I even mentioned it. Genuinely surprised by the quality."</p>
+          <div class="review-helpful"><i class="fa-regular fa-thumbs-up"></i> 15 people found this helpful</div>
+        </div>
+
+        <div class="review-card hidden-review">
+          <div class="review-top">
+            <div class="review-avatar" style="--av-bg:#f0fff4;--av-color:#177a37">P</div>
+            <div>
+              <h5>Priya K. <span class="verified-badge"><i class="fa-solid fa-circle-check"></i> Verified</span></h5>
+              <div class="review-stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+            </div>
+            <span class="review-date">2 months ago</span>
+          </div>
+          <p>"I have rosacea and reactive skin — most balms sting or trigger breakouts around my mouth. This is the first one I've used with zero reaction. I'm finally confident recommending something to others with sensitive skin."</p>
+          <div class="review-helpful"><i class="fa-regular fa-thumbs-up"></i> 33 people found this helpful</div>
+        </div>
+
+        <div class="review-card hidden-review">
+          <div class="review-top">
+            <div class="review-avatar" style="--av-bg:#fff0f5;--av-color:#c0336b">N</div>
+            <div>
+              <h5>Nandita V.</h5>
+              <div class="review-stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-regular fa-star"></i></div>
+            </div>
+            <span class="review-date">3 months ago</span>
+          </div>
+          <p>"I read every ingredient label before buying — this one passed every check. Coconut oil, carrot seed oil, no parabens, no mineral oil. The moment it touched my lips I knew it was different. It actually nourishes, not just coats."</p>
+          <div class="review-helpful"><i class="fa-regular fa-thumbs-up"></i> 21 people found this helpful</div>
+        </div>
+
+      </div>
+
+      <div class="show-more-wrap" data-aos="fade-up">
+        <button class="btn btn-outline" id="showMoreBtn">
+          <i class="fa-solid fa-chevron-down"></i> Show More Reviews
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="faq" id="faq">
+    <div class="faq-container">
+      <div class="section-header" data-aos="fade-up">
+        <div class="section-label"><i class="fa-solid fa-circle-question"></i> FAQ</div>
+        <h2 class="section-title">Your Questions,<br /><em>Answered</em></h2>
+        <p class="section-sub">Everything you need to know before you buy</p>
+      </div>
+
+      <div class="faq-list">
+
+        <div class="faq-item" data-aos="fade-up" data-aos-delay="0">
+          <button class="faq-q" aria-expanded="false">
+            <span>Is this lip balm safe for children?</span>
+            <span class="faq-icon"><i class="fa-solid fa-plus"></i></span>
+          </button>
+          <div class="faq-a">
+            <p>Yes. The formula uses 100% natural ingredients and is free from parabens, sulphates, and synthetic fragrances — making it safe for children aged 3 and above. It's hypoallergenic and dermatologist-tested, so even the most sensitive skin can use it daily without concern.</p>
+          </div>
+        </div>
+
+        <div class="faq-item" data-aos="fade-up" data-aos-delay="80">
+          <button class="faq-q" aria-expanded="false">
+            <span>Can I use it as a base under lipstick?</span>
+            <span class="faq-icon"><i class="fa-solid fa-plus"></i></span>
+          </button>
+          <div class="faq-a">
+            <p>Absolutely. The lightweight, non-greasy texture absorbs quickly and creates a smooth, hydrated base that helps lip colour apply more evenly and last longer. Apply a thin layer, wait about 60 seconds, and your lips are perfectly prepped for any lip product.</p>
+          </div>
+        </div>
+
+        <div class="faq-item" data-aos="fade-up" data-aos-delay="160">
+          <button class="faq-q" aria-expanded="false">
+            <span>How long before I notice a visible difference?</span>
+            <span class="faq-icon"><i class="fa-solid fa-plus"></i></span>
+          </button>
+          <div class="faq-a">
+            <p>Most users notice softer, smoother lips within 3–5 days of consistent use. For severely chapped lips, applying at night and again in the morning typically shows visible repair within one week. For the best results, use it as part of both your morning and bedtime routine.</p>
+          </div>
+        </div>
+
+        <div class="faq-item" data-aos="fade-up" data-aos-delay="240">
+          <button class="faq-q" aria-expanded="false">
+            <span>Is it vegan and cruelty-free?</span>
+            <span class="faq-icon"><i class="fa-solid fa-plus"></i></span>
+          </button>
+          <div class="faq-a">
+            <p>Yes — PETA certified cruelty-free. No animal testing is conducted at any stage of production. The formula is primarily plant-based; if you follow a strict vegan lifestyle, please review the full ingredient list, as some Himalaya variants may contain beeswax.</p>
+          </div>
+        </div>
+
+        <div class="faq-item" data-aos="fade-up" data-aos-delay="320">
+          <button class="faq-q" aria-expanded="false">
+            <span>How is this different from petroleum-based balms?</span>
+            <span class="faq-icon"><i class="fa-solid fa-plus"></i></span>
+          </button>
+          <div class="faq-a">
+            <p>Petroleum jelly (petrolatum) sits on the surface — it doesn't nourish or absorb into your skin. Himalaya's botanical oils penetrate the lip barrier, delivering vitamins and fatty acids that actively repair and build moisture from within. Your lips genuinely improve over time, rather than just feeling coated.</p>
+          </div>
+        </div>
+
+        <div class="faq-item" data-aos="fade-up" data-aos-delay="400">
+          <button class="faq-q" aria-expanded="false">
+            <span>Does it offer sun protection?</span>
+            <span class="faq-icon"><i class="fa-solid fa-plus"></i></span>
+          </button>
+          <div class="faq-a">
+            <p>The natural oils — particularly carrot seed oil — provide a low level of natural UV protection that's adequate for everyday indoor and casual outdoor use. For prolonged direct sun exposure, we recommend pairing this with a dedicated SPF lip balm for full protection.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="contact" id="contact">
+    <div class="contact-container">
+      <div class="contact-left" data-aos="fade-right" data-aos-duration="900">
+        <div class="section-label"><i class="fa-solid fa-envelope"></i> Get in Touch</div>
+        <h2 class="section-title">We'd Love to<br /><em>Hear From You</em></h2>
+        <p>Whether you have a question about the product, a wholesale enquiry, or a press request — drop us a message and we'll get back to you within 24 hours.</p>
+        <div class="contact-info-list">
+          <div class="contact-info-item">
+            <div class="info-icon"><i class="fa-solid fa-envelope"></i></div>
+            <span>hello@himalayalipcare.in</span>
+          </div>
+          <div class="contact-info-item">
+            <div class="info-icon"><i class="fa-solid fa-phone"></i></div>
+            <span>+91 98765 43210</span>
+          </div>
+          <div class="contact-info-item">
+            <div class="info-icon"><i class="fa-solid fa-location-dot"></i></div>
+            <span>Bengaluru, Karnataka, India</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="contact-right" data-aos="fade-left" data-aos-duration="900" data-aos-delay="150">
+        <form id="contactForm" action="https://formspree.io/f/xldkqjrb" method="POST">
+          <div class="form-group">
+            <label for="name"><i class="fa-solid fa-user"></i> Full Name</label>
+            <input id="name" name="name" type="text" placeholder="e.g. Priya Sharma" required />
+          </div>
+          <div class="form-group">
+            <label for="email"><i class="fa-solid fa-at"></i> Email Address</label>
+            <input id="email" name="email" type="email" placeholder="you@example.com" required />
+          </div>
+          <div class="form-group">
+            <label for="message"><i class="fa-solid fa-message"></i> Your Message</label>
+            <textarea id="message" name="message" rows="4" placeholder="How can we help you?" required></textarea>
+          </div>
+          <button class="btn btn-primary" type="submit">
+            <i class="fa-solid fa-paper-plane"></i> Send Message
+          </button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <div class="brand-logo small">
+          <img src="Assets/logo.webp" alt="Himalaya Lip Care logo" loading="lazy" />
         </div>
         <div>
-          <div style="font-weight: 700">Himalaya Lip Care</div>
-          <div style="font-size: 12px; color: var(--muted)">Natural. Gentle. Effective.</div>
+          <div class="brand-name">Himalaya Lip Care</div>
+          <div class="footer-tagline">Natural. Gentle. Effective.</div>
         </div>
       </div>
-            
-      <nav>
-        <a href="#about">About</a>
-        <a href="#benefits">Benefits</a>
-        <a href="#ingredients">Ingredients</a>
-        <a href="#reviews">Reviews</a>
-        <a href="#contact">Contact</a>
-      </nav>
-    </header>
-
-    <main class="container">
-      <!-- HERO -->
-      <section class="hero" id="home">
-        <div class="hero-left" data-aos="fade-right">
-          <div class="eyebrow">Get natural relief</div>
-          <h1>Natural care for dry and chapped lips</h1>
-          <p class="tagline">A gentle blend of natural oils to soothe, hydrate and protect your lips all day.</p>
-          <div class="cta">
-            <button class="btn add-to-cart">Add to Cart</button>
-            <button class="btn secondary">Learn More</button>
-          </div>
-          <div style="margin-top: 18px; color: var(--muted); font-size: 14px" class="hero-note">Net Wt. 10 g • Dermatologically tested</div>
-        </div>
-        <div class="hero-right" data-aos="zoom-in">
-          <div class="product-card">
-            <img src="Assets/hero.png" alt="Himalaya Lip Balm tube" class="product-img" />
-          </div>
-        </div>
-      </section>
-
-      <!-- ABOUT -->
-      <section class="about" id="about">
-        <div class="about-img" data-aos="fade-up">
-          <img src="Assets/about.jpeg" alt="About Himalaya Lip Balm Product" />
-        </div>
-        <div data-aos="fade-left">
-          <h2>About the Product</h2>
-          <p style="color: var(--muted)">Formulated with nourishing oils and natural extracts to protect and restore your lips. Lightweight, non-greasy and suitable for daily use — perfect for all ages.</p>
-          <ul style="color: var(--muted); margin-top: 12px">
-            <li>Long-lasting hydration</li>
-            <li>Made with natural extracts</li>
-            <li>PETA-friendly and dermatologist-tested</li>
-          </ul>
-        </div>
-      </section>
-
-      <!-- BENEFITS -->
-      <section class="benefits" id="benefits">
-        <div data-aos="fade-up">
-          <h2 style="margin: 0 0 12px; font-family: var(--heading-font)">Benefits</h2>
-          <p style="color: var(--muted); margin: 0 0 18px">Why people love this lip balm</p>
-        </div>
-
-        <div class="benefit-grid" data-aos="fade-up" data-aos-delay="100">
-          <div class="benefit">
-            <img src="Assets/benefit1.webp" alt="Intense Hydration for lips" />
-            <div>
-              <h3>Intense Hydration</h3>
-              <p>Deeply moisturizes lips and reduces chapping with a smooth, protective layer.</p>
-            </div>
-          </div>
-
-          <div class="benefit">
-            <img src="Assets/benefit2.jpg" alt="Natural nourishment from oils" />
-            <div>
-              <h3>Natural Nourishment</h3>
-              <p>Enriched with natural oils to nourish and restore dry, damaged lips.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- INGREDIENTS -->
-      <section class="ingredients" id="ingredients" data-aos="fade-up" data-aos-anchor-placement="center-bottom">
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px;">
-          <div>
-            <h2 style="margin: 0; font-family: var(--heading-font)">Key Ingredients</h2>
-            <p style="color: var(--muted); margin: 6px 0 0">Natural extracts used in formulation</p>
-          </div>
-        </div>
-
-        <div class="ingredient-grid">
-          <div class="ingredient-card" data-aos="zoom-in" data-aos-delay="50">
-            <img src="Assets/carrot-oil.jpeg" alt="Carrot seed oil" />
-            <h3>Carrot Seed Oil</h3>
-            <p>Rich in antioxidants and vitamins that help rejuvenate dry lipsand add gentle nourishment.
-            </p>
-          </div>
-
-          <div class="ingredient-card" data-aos="zoom-in" data-aos-delay="100">
-            <img src="Assets/castor-oil.jpeg" alt="Castor oil" />
-            <h3>Castor Oil</h3>
-            <p>Provides deep conditioning and locks in moisture for long-lasting softness.</p>
-          </div>
-
-          <div class="ingredient-card" data-aos="zoom-in" data-aos-delay="150">
-            <img src="Assets/coco-oil.jpeg" alt="Coconut oil" />
-            <h3>Coconut Oil</h3>
-            <p>Lightweight and nourishing — helps soothe and protect delicate lip skin.</p>
-          </div>
-
-          <div class="ingredient-card" data-aos="zoom-in" data-aos-delay="200">
-            <img src="Assets/wheat-germ-oil.jpeg" alt="Wheat germ oil" />
-            <h3>Wheat Germ Oil</h3>
-            <p>Packed with vitamins that support skin repair and natural softness.</p>
-          </div>
-        </div>
-      </section>
-
-      <!-- REVIEWS -->
-      <section class="reviews" id="reviews">
-        <div class="summary" data-aos="fade-up">
-          <div>
-            <h2 style="margin: 0; font-family: var(--heading-font)">
-              Product Reviews
-            </h2>
-            <p style="color: var(--muted); margin: 6px 0 0">
-              See what customers are saying
-            </p>
-          </div>
-          <div class="rating">
-            <div style="font-size: 48px; font-family: var(--heading-font)">
-              4.3
-            </div>
-            <div>
-              <div class="stars">★★★★★</div>
-              <div style="color: var(--muted); font-size: 13px">86 Reviews</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="customer-list" data-aos="fade-up" data-aos-delay="80">
-          <div class="customer">
-            <div class="avatar">S</div>
-            <div class="cust-meta">
-              <h5>Shraddha k14</h5>
-              <p>Very moisturizing! My lips feel soft all day.</p>
-            </div>
-            <div class="cust-date">1 month ago</div>
-          </div>
-
-          <div class="customer">
-            <div class="avatar" style="background: #f6f0ff; color: #6b3aa6">M</div>
-            <div class="cust-meta">
-              <h5>Monik Gandhi</h5>
-              <p>Natural scent and non-greasy — love it.</p>
-            </div>
-            <div class="cust-date">5 months ago</div>
-          </div>
-
-          <div class="customer">
-            <div class="avatar" style="background: #fff6ea; color: #e07a1f">A</div>
-            <div class="cust-meta">
-              <h5>Anita P</h5>
-              <p>Perfect for winters. No cracking anymore.</p>
-            </div>
-            <div class="cust-date">2 weeks ago</div>
-          </div>
-
-          <div class="customer">
-            <div class="avatar" style="background: #e8f8ff; color: #0b6b8c">R</div>
-            <div class="cust-meta">
-              <h5>Rohit S</h5>
-              <p>Nice packaging and the texture is great.</p>
-            </div>
-            <div class="cust-date">3 months ago</div>
-          </div>
-
-          <div class="customer">
-            <div class="avatar" style="background: #f0fff4; color: #177a37">P</div>
-            <div class="cust-meta">
-              <h5>Priya K</h5>
-              <p>Subtle fragrance. Gentle on sensitive skin.</p>
-            </div>
-            <div class="cust-date">2 months ago</div>
-          </div>
-
-          <div class="show-more-container">
-            <button id="showMoreBtn" class="show-more-btn">Show More</button>
-          </div>
-        </div>
-      </section>
-
-      <!-- CONTACT -->
-      <section class="contact" id="contact" data-aos="fade-up">
-        <div style="display: flex; gap: 20px; align-items: center; flex-wrap: wrap">
-          <div style="flex: 1; min-width: 280px" data-aos="fade-right" data-aos-delay="100">
-            <h2 style="margin: 0; font-family: var(--heading-font)">Get in touch</h2>
-            <p style="color: var(--muted); margin-top: 8px">Questions? Wholesale or press enquiries? Drop a message.</p>
-          </div>
-
-          <div style="flex: 1; min-width: 280px" data-aos="fade-left" data-aos-delay="200">
-            <form id="contactForm" action="https://formspree.io/f/xldkqjrb" method="POST">
-              <label for="name" class="visually-hidden">Your Name</label>
-              <input id="name" name="name" type="text" placeholder="Your name" required />
-            
-              <label for="email" class="visually-hidden">Your Email</label>
-              <input id="email" name="email" type="email" placeholder="Your email" required />
-            
-              <label for="message" class="visually-hidden">Message</label>
-              <textarea id="message" name="message" rows="3" placeholder="Message" required></textarea>
-
-              <button class="btn" type="submit">Send Message</button>
-            </form>
-
-          </div>
-        </div>
-      </section>
-
-      <!-- Thank You Popup -->
-     <div class="contact-success" id="contactSuccess">
-        <div class="contact-popup">
-            <h2>🌱 Thanks for Getting in Touch!</h2>
-            <p>Your message has been received successfully.</p>
-            <p style="font-size: 14px; color: var(--muted); margin-top: 6px;">
-              We’ll get back to you soon — stay calm, stay naturally beautiful.
-            </p>
-        </div>
-     </div>
-    </main>
-
-     <footer class="footer">
-      <div class="footer-content">
-        <p>© 2025 <strong>Himalaya Lip Care</strong> — Demo Showcase</p>
-        <div class="social-links">
-          <a href="#" aria-label="Instagram"><i class="fa-brands fab fa-instagram"></i></a>
-          <a href="#" aria-label="Facebook"><i class="fa-brands fab fab fa-facebook"></i></a>
-          <a href="#" aria-label="Twitter"><i class="fa-brands fab fa-twitter"></i></a>
-        </div>
+      <p class="footer-copy">© 2025 Himalaya Lip Care — Product Showcase</p>
+      <div class="footer-social">
+        <a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+        <a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+        <a href="#" aria-label="X (Twitter)"><i class="fa-brands fa-x-twitter"></i></a>
+        <a href="#" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
       </div>
-    </footer>
+    </div>
+  </footer>
 
-    <button id="backToTop" class="btn">
-      <i class="bi bi-arrow-bar-up"></i>
-    </button>
+  <!-- BACK TO TOP -->
+  <button id="backToTop" aria-label="Back to top">
+    <i class="fa-solid fa-arrow-up"></i>
+  </button>
 
-    <!-- Cart Drawer -->
-<div class="cart-drawer" id="cartDrawer">
-  <div class="cart-content">
+  <!-- CART DRAWER -->
+  <div class="cart-overlay" id="cartOverlay"></div>
+  <div class="cart-drawer" id="cartDrawer">
+
     <div class="cart-header">
-      <h3><i class="fa-solid fa-cart-shopping"></i> Your Cart</h3>
-      <button class="close-cart">&times;</button>
-    </div>
-    
-    <div class="cart-success" id="cartSuccess">
-      <i class="fa-solid fa-circle-check"></i>
-      <span>Added to your cart successfully !</span>
-    </div>
-
-    <div class="cart-item">
-      <img src="Assets/lipbalm.png" alt="Himalaya Lip Balm">
-      <div class="item-info">
-        <h4>Himalaya Lip Balm</h4>
-        <p class="item-price">₹50</p>
-        <div class="qty-controls">
-          <button class="qty-btn minus">-</button>
-          <span class="qty-value">1</span>
-          <button class="qty-btn plus">+</button>
+      <div class="cart-header-left">
+        <div class="cart-header-icon"><i class="fa-solid fa-bag-shopping"></i></div>
+        <div>
+          <h3>Your Bag</h3>
+          <span class="cart-header-sub" id="cartHeaderSub">1 item · ₹50</span>
         </div>
       </div>
+      <button class="close-cart" id="closeCart" aria-label="Close cart">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
     </div>
 
-    <div class="cart-summary">
-      <p><strong>Total:</strong> <span class="cartTotal">₹50</span></p>
+    <div class="cart-added-toast" id="cartSuccess">
+      <i class="fa-solid fa-circle-check"></i>
+      <span>Added to your bag!</span>
+    </div>
+
+    <div class="cart-body">
+      <p class="cart-product-label">IN YOUR BAG</p>
+      <div class="cart-item">
+        <div class="cart-item-img-wrap">
+          <img src="Assets/lipbalm.png" alt="Himalaya Lip Balm" loading="lazy" />
+        </div>
+        <div class="cart-item-info">
+          <h4>Himalaya Lip Balm</h4>
+          <p class="cart-item-sub">Natural Botanical Formula · 10 g</p>
+          <div class="cart-item-row">
+            <span class="cart-item-price">₹50 / unit</span>
+            <div class="qty-controls">
+              <button class="qty-btn minus" aria-label="Decrease quantity"><i class="fa-solid fa-minus"></i></button>
+              <span class="qty-value">1</span>
+              <button class="qty-btn plus" aria-label="Increase quantity"><i class="fa-solid fa-plus"></i></button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cart-perks">
+        <div class="perk"><i class="fa-solid fa-truck-fast"></i><span>Free delivery on orders above ₹200</span></div>
+        <div class="perk"><i class="fa-solid fa-rotate-left"></i><span>Hassle-free 7-day returns</span></div>
+        <div class="perk"><i class="fa-solid fa-shield-halved"></i><span>Secure, encrypted checkout</span></div>
+      </div>
     </div>
 
     <div class="cart-footer">
-      <button class="btn checkout-btn">Checkout</button>
+      <div class="cart-subtotal-row">
+        <span>Subtotal</span><span>₹<span class="cartSubtotal">50</span></span>
+      </div>
+      <div class="cart-promo-row">
+        <i class="fa-solid fa-tag"></i>
+        <span>Promo applied:</span>
+        <span class="promo-code-tag">NATURE10</span>
+      </div>
+      <div class="cart-divider"></div>
+      <div class="cart-total-row">
+        <span>Total</span>
+        <span class="cartTotal">₹50</span>
+      </div>
+      <button class="checkout-btn" id="checkoutBtn">
+        <i class="fa-solid fa-lock"></i> Secure Checkout
+      </button>
+      <div class="cart-payment-icons">
+        <i class="fa-brands fa-cc-visa"></i>
+        <i class="fa-brands fa-cc-mastercard"></i>
+        <i class="fa-brands fa-google-pay"></i>
+        <i class="fa-solid fa-mobile-screen-button"></i>
+        <span>UPI · Cards · Wallets</span>
+      </div>
     </div>
   </div>
-</div>
 
-<div class="order-success" id="orderSuccess">
-  <div class="order-content">
-    <h2>🌿 Order Placed Successfully !</h2>
-    <p>Your journey to naturally soft, hydrated lips begins now. We’re preparing your Himalaya Lip Balm for dispatch.</p>
-    <p style="font-size: 14px; color: var(--muted); margin-top: 6px;">
-      Thank you for trusting the purity of nature.
-    </p>
+  <!-- MODALS -->
+  <div class="modal-overlay" id="contactSuccess">
+    <div class="modal-card">
+      <div class="modal-icon success"><i class="fa-solid fa-envelope-circle-check"></i></div>
+      <h2>Message Received!</h2>
+      <p>Thank you for reaching out. We'll get back to you within 24 hours.</p>
+      <p class="modal-sub">Stay calm, stay naturally beautiful 🌿</p>
+    </div>
   </div>
-</div>
 
+  <div class="modal-overlay" id="orderSuccess">
+    <div class="modal-card">
+      <div class="modal-icon order"><i class="fa-solid fa-circle-check"></i></div>
+      <h2>Order Placed!</h2>
+      <p>Your Himalaya Lip Balm is being prepared for dispatch. Estimated delivery: 3–5 business days.</p>
+      <p class="modal-sub">Thank you for choosing the purity of nature 🌱</p>
+    </div>
+  </div>
+
+  <!-- WISHLIST TOAST -->
+  <div class="wishlist-toast" id="wishlistToast">
+    <i class="fa-solid fa-heart"></i>
+    <span id="wishlistMsg">Added to wishlist!</span>
+  </div>
+
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="js/main.js"></script>
 </body>
 </html>
