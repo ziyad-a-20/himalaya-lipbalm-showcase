@@ -12,7 +12,7 @@
   --accent: #c8a96e;
   --ink: #111c18;
   --ink-2: #3a4a42;
-  --muted: #7a8c84;
+  --muted: #5e706a;
   --border: rgba(42, 140, 110, 0.14);
   --white: #ffffff;
   --bg: #f7fbf8;
@@ -64,6 +64,38 @@ ul {
 em {
   font-style: italic;
   color: var(--green);
+}
+
+/* ── SKIP LINK ────────────────────────────────── */
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: 16px;
+  z-index: 10000;
+  background: var(--green);
+  color: white;
+  padding: 10px 18px;
+  border-radius: 0 0 10px 10px;
+  font-size: 14px;
+  font-weight: 600;
+  transition: top 0.2s ease;
+  text-decoration: none;
+}
+.skip-link:focus {
+  top: 0;
+}
+
+/* ── SCREEN READER ONLY ───────────────────────── */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 /* ── LAZY IMAGE BLUR-UP ───────────────────────── */
@@ -182,6 +214,24 @@ em {
   box-shadow: 0 6px 20px rgba(42, 140, 110, 0.3);
 }
 
+/* ── FORM VALIDATION ──────────────────────────── */
+.field-error {
+  display: block;
+  font-size: 12px;
+  color: #c0392b;
+  margin-top: 5px;
+  min-height: 16px;
+}
+input.invalid,
+textarea.invalid {
+  border-color: #c0392b;
+  box-shadow: 0 0 0 3px rgba(192, 57, 43, 0.1);
+}
+input.valid,
+textarea.valid {
+  border-color: var(--green);
+}
+
 /* ══════════════════════════════════════════════
    PAGE LOADER — Botanical Leaf Ink-Draw
 ══════════════════════════════════════════════ */
@@ -212,7 +262,6 @@ body:not(.loading) .page-loader {
   gap: 20px;
 }
 
-/* ── SVG leaf draw animation ── */
 .loader-leaf-wrap {
   position: relative;
   width: 120px;
@@ -227,7 +276,6 @@ body:not(.loading) .page-loader {
   height: 120px;
 }
 
-/* Leaf outline — stroke draw */
 .leaf-path {
   stroke-dasharray: 340;
   stroke-dashoffset: 340;
@@ -240,14 +288,12 @@ body:not(.loading) .page-loader {
   }
 }
 
-/* Centre vein */
 .vein-path {
   stroke-dasharray: 102;
   stroke-dashoffset: 102;
   animation: drawVein 0.6s ease 1.1s forwards;
 }
 
-/* Side veins */
 .vein-side {
   stroke-dasharray: 60;
   stroke-dashoffset: 60;
@@ -271,7 +317,6 @@ body:not(.loading) .page-loader {
   }
 }
 
-/* Leaf fill — fades in after outline is complete */
 .leaf-fill {
   animation: fillLeaf 0.5s ease 1.7s forwards;
 }
@@ -284,7 +329,6 @@ body:not(.loading) .page-loader {
   }
 }
 
-/* Floating dewdrops */
 .loader-drop {
   position: absolute;
   border-radius: 50% 0 50% 50%;
@@ -337,7 +381,6 @@ body:not(.loading) .page-loader {
   }
 }
 
-/* ── Text ── */
 .loader-text-wrap {
   display: flex;
   flex-direction: column;
@@ -374,7 +417,6 @@ body:not(.loading) .page-loader {
   text-transform: uppercase;
 }
 
-/* ── Progress bar ── */
 .loader-progress {
   width: 100px;
   height: 2px;
@@ -881,7 +923,6 @@ body:not(.loading) .page-loader {
   background: var(--border);
 }
 
-/* ── Glassmorphism Product ── */
 .hero-right {
   display: flex;
   justify-content: center;
@@ -948,7 +989,6 @@ body:not(.loading) .page-loader {
   }
 }
 
-/* Glassmorphism card wrapping the product */
 .product-glass-card {
   position: relative;
   z-index: 2;
@@ -1183,7 +1223,7 @@ body:not(.loading) .page-loader {
 }
 
 /* ══════════════════════════════════════════════
-   BENEFITS  — editorial full-image cards
+   BENEFITS
 ══════════════════════════════════════════════ */
 .benefits {
   padding: 100px 28px;
@@ -1505,7 +1545,6 @@ body:not(.loading) .page-loader {
   font-weight: 600;
   color: var(--ink);
 }
-
 .comparison-table td:first-child {
   font-weight: 600;
   color: var(--muted);
@@ -1581,7 +1620,6 @@ body:not(.loading) .page-loader {
   margin-bottom: 4px;
 }
 
-/* Rating bars */
 .rating-bars {
   display: flex;
   flex-direction: column;
@@ -1621,7 +1659,6 @@ body:not(.loading) .page-loader {
   font-weight: 500;
 }
 
-/* Review cards */
 .review-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -1791,7 +1828,6 @@ body:not(.loading) .page-loader {
   flex: 1;
   transition: color var(--t);
 }
-
 .faq-q:hover span:first-child {
   color: var(--green);
 }
@@ -1963,6 +1999,12 @@ textarea:focus {
   margin-top: 4px;
 }
 
+/* ── MODAL CLOSE BUTTON ───────────────────────── */
+.modal-close-btn {
+  width: 100%;
+  justify-content: center;
+}
+
 /* ══════════════════════════════════════════════
    FOOTER
 ══════════════════════════════════════════════ */
@@ -2061,7 +2103,7 @@ textarea:focus {
 }
 
 /* ══════════════════════════════════════════════
-   CART DRAWER — Luxury
+   CART DRAWER
 ══════════════════════════════════════════════ */
 .cart-overlay {
   position: fixed;
@@ -2098,7 +2140,6 @@ textarea:focus {
   right: 0;
 }
 
-/* Cart header — dark luxury */
 .cart-header {
   background: var(--ink);
   padding: 22px 24px;
@@ -2131,7 +2172,6 @@ textarea:focus {
   font-weight: 700;
   color: white;
 }
-
 .cart-header-sub {
   font-size: 12px;
   color: rgba(255, 255, 255, 0.45);
@@ -2158,7 +2198,6 @@ textarea:focus {
   color: white;
 }
 
-/* Toast */
 .cart-added-toast {
   margin: 14px 20px 0;
   padding: 12px 16px;
@@ -2181,13 +2220,11 @@ textarea:focus {
   transform: translateY(0);
 }
 
-/* Cart body */
 .cart-body {
   padding: 20px;
   flex: 1;
   overflow-y: auto;
 }
-
 .cart-product-label {
   font-size: 10px;
   font-weight: 700;
@@ -2224,7 +2261,7 @@ textarea:focus {
 
 .cart-item-info {
   flex: 1;
-  padding: 16px 16px;
+  padding: 16px;
 }
 .cart-item-info h4 {
   font-family: var(--font-head);
@@ -2292,7 +2329,6 @@ textarea:focus {
   line-height: 32px;
 }
 
-/* Perks */
 .cart-perks {
   display: flex;
   flex-direction: column;
@@ -2317,7 +2353,6 @@ textarea:focus {
   text-align: center;
 }
 
-/* Cart footer */
 .cart-footer {
   padding: 20px 22px;
   border-top: 1px solid var(--border);
@@ -2360,7 +2395,7 @@ textarea:focus {
   color: var(--accent);
 }
 .promo-code-tag {
-  background: var(--accent);
+  background: var(--green);
   color: white;
   font-size: 10px;
   font-weight: 700;
@@ -2526,6 +2561,89 @@ textarea:focus {
 }
 .wishlist-toast i {
   color: #e0445a;
+}
+
+/* ══════════════════════════════════════════════
+   MOBILE STICKY BUY BAR
+══════════════════════════════════════════════ */
+.sticky-buy-bar {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 950;
+  background: var(--white);
+  border-top: 1px solid var(--border);
+  padding: 12px 20px;
+  box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.1);
+  transform: translateY(100%);
+  transition: transform 0.4s var(--ease-out);
+}
+.sticky-buy-bar.show {
+  transform: translateY(0);
+}
+
+.sticky-buy-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  max-width: 480px;
+  margin: 0 auto;
+}
+.sticky-buy-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.sticky-buy-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.sticky-buy-price {
+  font-size: 13px;
+  color: var(--muted);
+}
+.sticky-buy-btn {
+  padding: 12px 22px;
+  font-size: 14px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ══════════════════════════════════════════════
+   REVIEW & WISHLIST KEYFRAMES (moved from JS)
+══════════════════════════════════════════════ */
+@keyframes reviewFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.wishlist-btn.burst {
+  animation: heartBurst 0.4s ease;
+}
+
+@keyframes heartBurst {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.35);
+  }
+  70% {
+    transform: scale(0.9);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 /* ══════════════════════════════════════════════
@@ -2731,6 +2849,7 @@ textarea:focus {
   .about-img-frame img {
     height: 320px;
   }
+
   .benefits {
     padding: 60px 20px;
   }
@@ -2782,6 +2901,9 @@ textarea:focus {
     padding: 28px 20px;
   }
 
+  .footer {
+    padding-bottom: 90px;
+  }
   .footer-inner {
     flex-direction: column;
     align-items: center;
@@ -2797,6 +2919,13 @@ textarea:focus {
   }
   .hero-scroll-hint {
     display: none;
+  }
+
+  .sticky-buy-bar {
+    display: block;
+  }
+  #backToTop {
+    bottom: 80px;
   }
 }
 
@@ -2865,13 +2994,9 @@ textarea:focus {
 [data-aos].aos-animate {
   pointer-events: auto;
 }
-
-/* Table rows — AOS needs display:table-row to be preserved */
 tr[data-aos] {
   display: table-row !important;
 }
-
-/* Ensure faq-item transitions don't conflict with AOS */
 .faq-item[data-aos] {
   overflow: visible;
 }

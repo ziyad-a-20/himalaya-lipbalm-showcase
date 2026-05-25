@@ -32,7 +32,9 @@
   <!-- Theme colour -->
   <meta name="theme-color" content="#2a8c6e" />
 
-
+  <!-- Font preconnect + load -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
   <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
@@ -40,34 +42,32 @@
 </head>
 <body class="loading">
 
+  <!-- SKIP LINK -->
+  <a class="skip-link" href="#home">Skip to main content</a>
+
   <!-- PAGE LOADER -->
   <div class="page-loader" id="pageLoader">
     <div class="loader-inner">
       <div class="loader-leaf-wrap">
         <svg class="loader-leaf-svg" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <!-- Leaf outline path - drawn via stroke-dashoffset animation -->
           <path class="leaf-path"
             d="M60 10 C60 10, 100 30, 100 65 C100 90, 82 108, 60 110 C38 108, 20 90, 20 65 C20 30, 60 10, 60 10 Z"
             stroke="#2a8c6e" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-          <!-- Centre vein -->
           <path class="vein-path"
             d="M60 10 L60 110"
             stroke="#2a8c6e" stroke-width="1.5" fill="none" stroke-linecap="round" opacity="0.5"/>
-          <!-- Side veins left -->
           <path class="vein-side v1"
             d="M60 40 C50 45, 32 52, 28 62"
             stroke="#2a8c6e" stroke-width="1.2" fill="none" stroke-linecap="round" opacity="0.4"/>
           <path class="vein-side v2"
             d="M60 58 C48 62, 30 68, 26 78"
             stroke="#2a8c6e" stroke-width="1.2" fill="none" stroke-linecap="round" opacity="0.4"/>
-          <!-- Side veins right -->
           <path class="vein-side v3"
             d="M60 40 C70 45, 88 52, 92 62"
             stroke="#2a8c6e" stroke-width="1.2" fill="none" stroke-linecap="round" opacity="0.4"/>
           <path class="vein-side v4"
             d="M60 58 C72 62, 90 68, 94 78"
             stroke="#2a8c6e" stroke-width="1.2" fill="none" stroke-linecap="round" opacity="0.4"/>
-          <!-- Leaf fill - fades in after draw -->
           <path class="leaf-fill"
             d="M60 10 C60 10, 100 30, 100 65 C100 90, 82 108, 60 110 C38 108, 20 90, 20 65 C20 30, 60 10, 60 10 Z"
             fill="#2a8c6e" opacity="0"/>
@@ -470,7 +470,6 @@
       </div>
 
       <div class="review-grid">
-
         <div class="review-card review-card--featured" data-aos="fade-up" data-aos-delay="0">
           <div class="review-top">
             <div class="review-avatar" style="--av-bg:#e9f7f2;--av-color:#2f8f6d">S</div>
@@ -548,7 +547,6 @@
           <p>"I read every ingredient label before buying — this one passed every check. Coconut oil, carrot seed oil, no parabens, no mineral oil. The moment it touched my lips I knew it was different. It actually nourishes, not just coats."</p>
           <div class="review-helpful"><i class="fa-regular fa-thumbs-up"></i> 21 people found this helpful</div>
         </div>
-
       </div>
 
       <div class="show-more-wrap" data-aos="fade-up">
@@ -569,7 +567,6 @@
       </div>
 
       <div class="faq-list">
-
         <div class="faq-item" data-aos="fade-up" data-aos-delay="0">
           <button class="faq-q" aria-expanded="false">
             <span>Is this lip balm safe for children?</span>
@@ -629,7 +626,6 @@
             <p>The natural oils — particularly carrot seed oil — provide a low level of natural UV protection that's adequate for everyday indoor and casual outdoor use. For prolonged direct sun exposure, we recommend pairing this with a dedicated SPF lip balm for full protection.</p>
           </div>
         </div>
-
       </div>
     </div>
   </section>
@@ -658,18 +654,21 @@
       </div>
 
       <div class="contact-right" data-aos="fade-left" data-aos-duration="900" data-aos-delay="150">
-        <form id="contactForm" action="https://formspree.io/f/xldkqjrb" method="POST">
+        <form id="contactForm" action="https://formspree.io/f/xldkqjrb" method="POST" novalidate>
           <div class="form-group">
             <label for="name"><i class="fa-solid fa-user"></i> Full Name</label>
             <input id="name" name="name" type="text" placeholder="e.g. Priya Sharma" required />
+            <span class="field-error" id="nameError"></span>
           </div>
           <div class="form-group">
             <label for="email"><i class="fa-solid fa-at"></i> Email Address</label>
             <input id="email" name="email" type="email" placeholder="you@example.com" required />
+            <span class="field-error" id="emailError"></span>
           </div>
           <div class="form-group">
             <label for="message"><i class="fa-solid fa-message"></i> Your Message</label>
             <textarea id="message" name="message" rows="4" placeholder="How can we help you?" required></textarea>
+            <span class="field-error" id="messageError"></span>
           </div>
           <button class="btn btn-primary" type="submit">
             <i class="fa-solid fa-paper-plane"></i> Send Message
@@ -709,13 +708,12 @@
   <!-- CART DRAWER -->
   <div class="cart-overlay" id="cartOverlay"></div>
   <div class="cart-drawer" id="cartDrawer">
-
     <div class="cart-header">
       <div class="cart-header-left">
         <div class="cart-header-icon"><i class="fa-solid fa-bag-shopping"></i></div>
         <div>
           <h3>Your Bag</h3>
-          <span class="cart-header-sub" id="cartHeaderSub">1 item · ₹50</span>
+          <span class="cart-header-sub" id="cartHeaderSub">1 item · ₹45</span>
         </div>
       </div>
       <button class="close-cart" id="closeCart" aria-label="Close cart">
@@ -747,6 +745,8 @@
           </div>
         </div>
       </div>
+      <!-- Accessible live region for cart updates -->
+      <div aria-live="polite" aria-atomic="true" class="sr-only" id="cartAnnounce"></div>
 
       <div class="cart-perks">
         <div class="perk"><i class="fa-solid fa-truck-fast"></i><span>Free delivery on orders above ₹200</span></div>
@@ -761,13 +761,13 @@
       </div>
       <div class="cart-promo-row">
         <i class="fa-solid fa-tag"></i>
-        <span>Promo applied:</span>
-        <span class="promo-code-tag">NATURE10</span>
+        <span>NATURE10 applied:</span>
+        <span class="promo-code-tag">Save ₹5</span>
       </div>
       <div class="cart-divider"></div>
       <div class="cart-total-row">
         <span>Total</span>
-        <span class="cartTotal">₹50</span>
+        <span class="cartTotal">₹45</span>
       </div>
       <button class="checkout-btn" id="checkoutBtn">
         <i class="fa-solid fa-lock"></i> Secure Checkout
@@ -783,28 +783,43 @@
   </div>
 
   <!-- MODALS -->
-  <div class="modal-overlay" id="contactSuccess">
+  <div class="modal-overlay" id="contactSuccess" role="dialog" aria-modal="true" aria-labelledby="contactSuccessTitle">
     <div class="modal-card">
       <div class="modal-icon success"><i class="fa-solid fa-envelope-circle-check"></i></div>
-      <h2>Message Received!</h2>
+      <h2 id="contactSuccessTitle">Message Received!</h2>
       <p>Thank you for reaching out. We'll get back to you within 24 hours.</p>
       <p class="modal-sub">Stay calm, stay naturally beautiful 🌿</p>
+      <button class="btn btn-primary modal-close-btn" id="closeContactModal" style="margin-top:18px;">Close</button>
     </div>
   </div>
 
-  <div class="modal-overlay" id="orderSuccess">
+  <div class="modal-overlay" id="orderSuccess" role="dialog" aria-modal="true" aria-labelledby="orderSuccessTitle">
     <div class="modal-card">
       <div class="modal-icon order"><i class="fa-solid fa-circle-check"></i></div>
-      <h2>Order Placed!</h2>
+      <h2 id="orderSuccessTitle">Order Placed!</h2>
       <p>Your Himalaya Lip Balm is being prepared for dispatch. Estimated delivery: 3–5 business days.</p>
       <p class="modal-sub">Thank you for choosing the purity of nature 🌱</p>
+      <button class="btn btn-primary modal-close-btn" id="closeOrderModal" style="margin-top:18px;">Close</button>
     </div>
   </div>
 
   <!-- WISHLIST TOAST -->
-  <div class="wishlist-toast" id="wishlistToast">
+  <div class="wishlist-toast" id="wishlistToast" role="status" aria-live="polite">
     <i class="fa-solid fa-heart"></i>
     <span id="wishlistMsg">Added to wishlist!</span>
+  </div>
+
+  <!-- MOBILE STICKY BUY BAR -->
+  <div class="sticky-buy-bar" id="stickyBuyBar">
+    <div class="sticky-buy-inner">
+      <div class="sticky-buy-info">
+        <span class="sticky-buy-name">Himalaya Lip Balm</span>
+        <span class="sticky-buy-price">₹45 after NATURE10 · 10g</span>
+      </div>
+      <button class="btn btn-primary add-to-cart sticky-buy-btn">
+        <i class="fa-solid fa-bag-shopping"></i> Add to Cart
+      </button>
+    </div>
   </div>
 
   <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
