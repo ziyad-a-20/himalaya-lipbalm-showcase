@@ -1,10 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description" content="Himalaya Lip Balm — Premium natural lip care with cold-pressed botanical oils. Discover benefits, ingredients, and honest customer reviews." />
   <title>Himalaya Lip Care — Natural Lip Balm</title>
+
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://himalaya-lip-care.vercel.app/" />
 
   <!-- Favicons -->
   <link rel="apple-touch-icon" sizes="180x180" href="Assets/favicons/apple-touch-icon.png" />
@@ -32,7 +35,38 @@
   <!-- Theme colour -->
   <meta name="theme-color" content="#2a8c6e" />
 
-  <!-- Font preconnect + load -->
+  <!-- JSON-LD Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org/",
+    "@type": "Product",
+    "name": "Himalaya Lip Balm",
+    "description": "A luxurious blend of cold-pressed botanical oils — soothing dryness, sealing in moisture, and protecting your lips through every season. Dermatologist-tested, PETA certified, free from parabens and sulphates.",
+    "image": "https://himalaya-lip-care.vercel.app/Assets/hero.png",
+    "brand": {
+      "@type": "Brand",
+      "name": "Himalaya"
+    },
+    "sku": "HLC-LB-10G",
+    "offers": {
+      "@type": "Offer",
+      "url": "https://himalaya-lip-care.vercel.app/",
+      "priceCurrency": "INR",
+      "price": "50",
+      "availability": "https://schema.org/InStock",
+      "itemCondition": "https://schema.org/NewCondition"
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.3",
+      "reviewCount": "86",
+      "bestRating": "5",
+      "worstRating": "1"
+    }
+  }
+  </script>
+
+  <!-- Font preconnect + load (display=swap already present) -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet" />
@@ -122,6 +156,14 @@
       </nav>
 
       <div class="nav-actions">
+        <!-- Share button -->
+        <button class="share-nav-btn" id="shareNavBtn" aria-label="Share this page">
+          <i class="fa-solid fa-share-nodes"></i>
+        </button>
+        <!-- Dark mode toggle -->
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+          <i class="fa-solid fa-moon" id="themeIcon"></i>
+        </button>
         <button class="wishlist-nav-btn" id="wishlistNavBtn" aria-label="Wishlist">
           <i class="fa-regular fa-heart" id="wishlistNavIcon"></i>
         </button>
@@ -171,6 +213,10 @@
           <button class="btn btn-ghost learn-more-btn">
             <i class="fa-solid fa-play"></i> Learn More
           </button>
+          <!-- Share button (hero) -->
+          <button class="btn btn-ghost share-btn" id="shareHeroBtn" aria-label="Share this product">
+            <i class="fa-solid fa-share-nodes"></i> Share
+          </button>
           <button class="wishlist-btn" id="wishlistBtn" aria-label="Add to wishlist">
             <i class="fa-regular fa-heart" id="wishlistBtnIcon"></i>
           </button>
@@ -191,8 +237,9 @@
           <div class="product-ring ring1"></div>
           <div class="product-ring ring2"></div>
           <div class="product-glass-card">
-            <img src="Assets/hero.png" alt="Himalaya Lip Balm tube" class="product-img lazy-img"
-                 data-src="Assets/hero.png" />
+            <!-- eager loading: above the fold, removed from lazy observer -->
+            <img src="Assets/hero.png" alt="Himalaya Lip Balm tube" class="product-img"
+                 loading="eager" fetchpriority="high" />
           </div>
           <div class="product-float-badge badge-top">
             <i class="fa-solid fa-star"></i> 4.3 Rating
@@ -392,7 +439,11 @@
       </div>
 
       <div class="comparison-wrap" data-aos="fade-up" data-aos-delay="100">
-        <div class="comparison-scroll">
+        <!-- Scroll hint for narrow mobile -->
+        <div class="table-scroll-hint" id="tableScrollHint">
+          <i class="fa-solid fa-left-right"></i> Scroll to see full comparison
+        </div>
+        <div class="comparison-scroll" id="comparisonScroll">
           <table class="comparison-table">
             <thead>
               <tr>
@@ -437,6 +488,8 @@
             </tbody>
           </table>
         </div>
+        <!-- Right fade mask -->
+        <div class="table-fade-mask" id="tableFadeMask"></div>
       </div>
     </div>
   </section>
@@ -678,24 +731,70 @@
     </div>
   </section>
 
-  <!-- FOOTER -->
+  <!-- FOOTER — enhanced with 3 columns -->
   <footer class="footer">
     <div class="footer-inner">
-      <div class="footer-brand">
-        <div class="brand-logo small">
-          <img src="Assets/logo.webp" alt="Himalaya Lip Care logo" loading="lazy" />
+
+      <!-- Col 1: Brand -->
+      <div class="footer-col footer-col--brand">
+        <div class="footer-brand">
+          <div class="brand-logo small">
+            <img src="Assets/logo.webp" alt="Himalaya Lip Care logo" loading="lazy" />
+          </div>
+          <div>
+            <div class="brand-name">Himalaya Lip Care</div>
+            <div class="footer-tagline">Natural. Gentle. Effective.</div>
+          </div>
         </div>
-        <div>
-          <div class="brand-name">Himalaya Lip Care</div>
-          <div class="footer-tagline">Natural. Gentle. Effective.</div>
+        <p class="footer-about">Crafted with cold-pressed botanical oils since 1930. Pure ingredients, trusted results — for every lip, every season.</p>
+        <div class="footer-social">
+          <a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+          <a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+          <a href="#" aria-label="X (Twitter)"><i class="fa-brands fa-x-twitter"></i></a>
+          <a href="#" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
         </div>
       </div>
-      <p class="footer-copy">© 2025 Himalaya Lip Care — Product Showcase</p>
-      <div class="footer-social">
-        <a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
-        <a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
-        <a href="#" aria-label="X (Twitter)"><i class="fa-brands fa-x-twitter"></i></a>
-        <a href="#" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
+
+      <!-- Col 2: Quick links -->
+      <div class="footer-col footer-col--links">
+        <h4 class="footer-col-title">Quick Links</h4>
+        <ul class="footer-links">
+          <li><a href="#about"><i class="fa-solid fa-chevron-right"></i> About</a></li>
+          <li><a href="#benefits"><i class="fa-solid fa-chevron-right"></i> Benefits</a></li>
+          <li><a href="#ingredients"><i class="fa-solid fa-chevron-right"></i> Ingredients</a></li>
+          <li><a href="#comparison"><i class="fa-solid fa-chevron-right"></i> Comparison</a></li>
+          <li><a href="#reviews"><i class="fa-solid fa-chevron-right"></i> Reviews</a></li>
+          <li><a href="#faq"><i class="fa-solid fa-chevron-right"></i> FAQ</a></li>
+        </ul>
+      </div>
+
+      <!-- Col 3: Newsletter -->
+      <div class="footer-col footer-col--newsletter">
+        <h4 class="footer-col-title">Stay in the Loop</h4>
+        <p class="footer-newsletter-desc">Get exclusive offers, skin care tips, and new product alerts. No spam, ever.</p>
+        <form class="footer-newsletter-form" id="newsletterForm" novalidate>
+          <div class="footer-newsletter-row">
+            <input type="email" id="newsletterEmail" placeholder="you@example.com" aria-label="Email for newsletter" required />
+            <button type="submit" class="newsletter-submit-btn" aria-label="Subscribe">
+              <i class="fa-solid fa-paper-plane"></i>
+            </button>
+          </div>
+          <span class="footer-newsletter-msg" id="newsletterMsg"></span>
+        </form>
+        <div class="footer-badges">
+          <span><i class="fa-solid fa-award"></i> PETA Certified</span>
+          <span><i class="fa-solid fa-flask"></i> Dermatologist Tested</span>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="footer-bottom">
+      <p class="footer-copy">© 2025 Himalaya Lip Care — Product Showcase. All rights reserved.</p>
+      <div class="footer-bottom-links">
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Use</a>
+        <a href="#">Sitemap</a>
       </div>
     </div>
   </footer>
@@ -728,7 +827,9 @@
 
     <div class="cart-body">
       <p class="cart-product-label">IN YOUR BAG</p>
-      <div class="cart-item">
+
+      <!-- Cart item — shown when qty > 0 -->
+      <div class="cart-item" id="cartItem">
         <div class="cart-item-img-wrap">
           <img src="Assets/lipbalm.png" alt="Himalaya Lip Balm" loading="lazy" />
         </div>
@@ -742,27 +843,51 @@
               <span class="qty-value">1</span>
               <button class="qty-btn plus" aria-label="Increase quantity"><i class="fa-solid fa-plus"></i></button>
             </div>
+            <!-- Remove item button (shown at qty = 1) -->
+            <button class="remove-item-btn" id="removeItemBtn" aria-label="Remove item">
+              <i class="fa-solid fa-trash-can"></i>
+            </button>
           </div>
         </div>
       </div>
+
+      <!-- Empty cart state -->
+      <div class="cart-empty" id="cartEmpty" style="display:none;">
+        <i class="fa-regular fa-bag-shopping"></i>
+        <p>Your bag is empty</p>
+        <span>Add the Himalaya Lip Balm to get started</span>
+        <button class="btn btn-primary add-to-cart" style="margin-top:16px;">
+          <i class="fa-solid fa-bag-shopping"></i> Add to Cart
+        </button>
+      </div>
+
       <!-- Accessible live region for cart updates -->
       <div aria-live="polite" aria-atomic="true" class="sr-only" id="cartAnnounce"></div>
 
-      <div class="cart-perks">
+      <!-- Promo code input -->
+      <div class="cart-promo-input-wrap" id="cartPromoWrap">
+        <div class="promo-input-row">
+          <input type="text" id="promoCodeInput" placeholder="Enter promo code" aria-label="Promo code" maxlength="20" />
+          <button class="promo-apply-btn" id="promoApplyBtn">Apply</button>
+        </div>
+        <span class="promo-feedback" id="promoFeedback"></span>
+      </div>
+
+      <div class="cart-perks" id="cartPerks">
         <div class="perk"><i class="fa-solid fa-truck-fast"></i><span>Free delivery on orders above ₹200</span></div>
         <div class="perk"><i class="fa-solid fa-rotate-left"></i><span>Hassle-free 7-day returns</span></div>
         <div class="perk"><i class="fa-solid fa-shield-halved"></i><span>Secure, encrypted checkout</span></div>
       </div>
     </div>
 
-    <div class="cart-footer">
+    <div class="cart-footer" id="cartFooter">
       <div class="cart-subtotal-row">
         <span>Subtotal</span><span>₹<span class="cartSubtotal">50</span></span>
       </div>
-      <div class="cart-promo-row">
+      <div class="cart-promo-row" id="cartPromoRow" style="display:none;">
         <i class="fa-solid fa-tag"></i>
-        <span>NATURE10 applied:</span>
-        <span class="promo-code-tag">Save ₹5</span>
+        <span id="cartPromoLabel">NATURE10 applied:</span>
+        <span class="promo-code-tag" id="cartPromoSaving">Save ₹5</span>
       </div>
       <div class="cart-divider"></div>
       <div class="cart-total-row">
@@ -807,6 +932,12 @@
   <div class="wishlist-toast" id="wishlistToast" role="status" aria-live="polite">
     <i class="fa-solid fa-heart"></i>
     <span id="wishlistMsg">Added to wishlist!</span>
+  </div>
+
+  <!-- SHARE TOAST -->
+  <div class="wishlist-toast share-toast" id="shareToast" role="status" aria-live="polite">
+    <i class="fa-solid fa-share-nodes"></i>
+    <span id="shareMsg">Link copied to clipboard!</span>
   </div>
 
   <!-- MOBILE STICKY BUY BAR -->

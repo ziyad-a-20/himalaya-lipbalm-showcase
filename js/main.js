@@ -1,6 +1,6 @@
-/* ── PAGE LOADER ──────────────────────────────── */
+/* ── PAGE LOADER — reduced min display to 1500ms ── */
 window.addEventListener("load", () => {
-  const minDisplay = 2400;
+  const minDisplay = 1500;
   const loadStart = performance.now();
 
   const reveal = () => {
@@ -9,7 +9,6 @@ window.addEventListener("load", () => {
 
     setTimeout(() => {
       document.body.classList.remove("loading");
-
       setTimeout(() => {
         const loader = document.getElementById("pageLoader");
         if (loader) loader.remove();
@@ -32,14 +31,36 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  /* AOS fallback — force-reveal all elements after 4s
-     in case AOS fails to load or device has reduced motion */
   setTimeout(() => {
     document.querySelectorAll("[data-aos]").forEach((el) => {
       el.classList.add("aos-animate");
       el.style.pointerEvents = "auto";
     });
   }, 4000);
+
+  /* ── DARK MODE ───────────────────────────────── */
+  const themeToggle = document.getElementById("themeToggle");
+  const themeIcon = document.getElementById("themeIcon");
+  const html = document.documentElement;
+
+  // Restore saved preference
+  const savedTheme = localStorage.getItem("hlc_theme") || "light";
+  html.setAttribute("data-theme", savedTheme);
+  updateThemeIcon(savedTheme);
+
+  function updateThemeIcon(theme) {
+    if (!themeIcon) return;
+    themeIcon.className =
+      theme === "dark" ? "fa-solid fa-sun" : "fa-solid fa-moon";
+  }
+
+  themeToggle?.addEventListener("click", () => {
+    const current = html.getAttribute("data-theme");
+    const next = current === "dark" ? "light" : "dark";
+    html.setAttribute("data-theme", next);
+    localStorage.setItem("hlc_theme", next);
+    updateThemeIcon(next);
+  });
 
   /* ── PROMO BANNER ────────────────────────────── */
   const promoBanner = document.getElementById("promoBanner");
@@ -57,7 +78,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const onScroll = () => {
     const sy = window.scrollY;
-
     navbar?.classList.toggle("scrolled", sy > 20);
     backToTop?.classList.toggle("show", sy > 400);
 
@@ -84,7 +104,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   window.addEventListener("scroll", onScroll, { passive: true });
 
-  /* ── NAV SMOOTH SCROLL ──────────────────────── */
+  /* ── NAV SMOOTH SCROLL ───────────────────────── */
   const hamburger = document.getElementById("hamburger");
   const navLinksEl = document.getElementById("navLinks");
 
@@ -141,7 +161,9 @@ document.addEventListener("DOMContentLoaded", () => {
     stickyBuyBar.classList.toggle("show", heroBottom < 0);
   }
 
-  /* ── LAZY IMAGE LOADING ─────────────────────── */
+  /* ── LAZY IMAGE LOADING ──────────────────────── */
+  // Hero product image is NOT lazy (eager + fetchpriority=high in HTML)
+  // Only observe remaining lazy images
   const lazyImgs = document.querySelectorAll(".lazy-img");
 
   const imgObserver = new IntersectionObserver(
@@ -166,7 +188,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   lazyImgs.forEach((img) => imgObserver.observe(img));
 
-  /* ── ANIMATED RATING BARS ───────────────────── */
+  /* ── ANIMATED RATING BARS ────────────────────── */
   let barsAnimated = false;
   const reviewsSection = document.getElementById("reviews");
 
@@ -184,7 +206,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  /* ── SCORE COUNT-UP ─────────────────────────── */
+  /* ── SCORE COUNT-UP ──────────────────────────── */
   let scoreAnimated = false;
   const scoreEl = document.getElementById("scoreCount");
 
@@ -209,7 +231,47 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  /* ── WISHLIST ────────────────────────────────── */
+  /* ── SHARE ───────────────────────────────────── */
+  const shareToast = document.getElementById("shareToast");
+  const shareMsg = document.getElementById("shareMsg");
+
+  async function handleShare() {
+    const shareData = {
+      title: "Himalaya Lip Care — Natural Lip Balm",
+      text: "Check out this natural lip balm — cold-pressed botanical oils, PETA certified, just ₹50.",
+      url: window.location.href,
+    };
+
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+        return;
+      } catch (err) {
+        // User cancelled — do nothing
+        if (err.name === "AbortError") return;
+      }
+    }
+
+    // Fallback: copy URL to clipboard
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      if (shareMsg) shareMsg.textContent = "Link copied to clipboard!";
+    } catch {
+      if (shareMsg) shareMsg.textContent = "Copy this URL to share";
+    }
+
+    shareToast?.classList.add("show");
+    setTimeout(() => shareToast?.classList.remove("show"), 2500);
+  }
+
+  document
+    .getElementById("shareNavBtn")
+    ?.addEventListener("click", handleShare);
+  document
+    .getElementById("shareHeroBtn")
+    ?.addEventListener("click", handleShare);
+
+  /* ── WISHLIST ─────────────────────────────────── */
   const wishlistBtn = document.getElementById("wishlistBtn");
   const wishlistBtnIcon = document.getElementById("wishlistBtnIcon");
   const wishlistNavBtn = document.getElementById("wishlistNavBtn");
@@ -217,7 +279,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const wishlistToast = document.getElementById("wishlistToast");
   const wishlistMsg = document.getElementById("wishlistMsg");
 
-  // Restore persisted state
   let wishlisted = localStorage.getItem("hlc_wishlisted") === "true";
 
   function applyWishlistUI() {
@@ -253,7 +314,7 @@ document.addEventListener("DOMContentLoaded", () => {
   wishlistBtn?.addEventListener("click", toggleWishlist);
   wishlistNavBtn?.addEventListener("click", toggleWishlist);
 
-  /* ── CART ───────────────────────────────────── */
+  /* ── CART ────────────────────────────────────── */
   const cartDrawer = document.getElementById("cartDrawer");
   const cartOverlay = document.getElementById("cartOverlay");
   const cartToggle = document.getElementById("cartToggle");
@@ -264,11 +325,21 @@ document.addEventListener("DOMContentLoaded", () => {
   const cartHeaderSub = document.getElementById("cartHeaderSub");
   const cartSubtotal = document.querySelector(".cartSubtotal");
   const totalEl = document.querySelector(".cartTotal");
+  const cartItem = document.getElementById("cartItem");
+  const cartEmpty = document.getElementById("cartEmpty");
+  const cartFooter = document.getElementById("cartFooter");
+  const removeItemBtn = document.getElementById("removeItemBtn");
 
   const PRICE = 50;
-  const PROMO_DISC = 0.1;
+  let cartQty = 0;
+  let promoApplied = false;
+  let promoDiscount = 0; // decimal e.g. 0.1 = 10%
 
-  let cartQty = 1;
+  // Valid promo codes map  { CODE: discountFraction }
+  const PROMO_CODES = {
+    NATURE10: 0.1,
+    SAVE15: 0.15,
+  };
 
   const openCart = () => {
     cartDrawer?.classList.add("show");
@@ -286,14 +357,20 @@ document.addEventListener("DOMContentLoaded", () => {
   closeCartBtn?.addEventListener("click", closeCart);
   cartOverlay?.addEventListener("click", closeCart);
 
+  // Add to cart buttons — adds 1 item and opens drawer
   document.querySelectorAll(".add-to-cart").forEach((btn) => {
     btn.addEventListener("click", () => {
+      if (cartQty === 0) {
+        cartQty = 1;
+        updateCart();
+      }
       openCart();
       cartSuccess?.classList.add("show");
       setTimeout(() => cartSuccess?.classList.remove("show"), 3000);
     });
   });
 
+  // Quantity controls
   document.querySelector(".qty-btn.plus")?.addEventListener("click", () => {
     cartQty++;
     updateCart();
@@ -306,29 +383,126 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+  // Remove item — empties the cart
+  removeItemBtn?.addEventListener("click", () => {
+    cartQty = 0;
+    updateCart();
+  });
+
   function updateCart() {
+    const isEmpty = cartQty === 0;
     const subtotal = cartQty * PRICE;
-    const discount = Math.round(subtotal * PROMO_DISC);
+    const discount = promoApplied ? Math.round(subtotal * promoDiscount) : 0;
     const total = subtotal - discount;
 
+    // Toggle cart item vs empty state
+    if (cartItem) cartItem.style.display = isEmpty ? "none" : "flex";
+    if (cartEmpty) cartEmpty.style.display = isEmpty ? "flex" : "none";
+    if (cartFooter) {
+      cartFooter.style.opacity = isEmpty ? "0.4" : "1";
+      cartFooter.style.pointerEvents = isEmpty ? "none" : "auto";
+    }
+
+    // Show/hide remove button — only visible at qty 1
+    if (removeItemBtn) {
+      removeItemBtn.classList.toggle("visible", cartQty === 1);
+    }
+
+    // Badge shows 0 when empty
     if (qtyValueEl) qtyValueEl.textContent = cartQty;
     if (cartBadge) cartBadge.textContent = cartQty;
     if (cartSubtotal) cartSubtotal.textContent = subtotal;
     if (totalEl) totalEl.textContent = `₹${total}`;
     if (cartHeaderSub) {
-      cartHeaderSub.textContent = `${cartQty} item${cartQty > 1 ? "s" : ""} · ₹${total}`;
+      cartHeaderSub.textContent = isEmpty
+        ? "0 items"
+        : `${cartQty} item${cartQty > 1 ? "s" : ""} · ₹${total}`;
     }
 
-    // Update promo savings label
-    const promoSaving = document.querySelector(".promo-code-tag");
-    if (promoSaving) promoSaving.textContent = `Save ₹${discount}`;
+    // Promo row
+    const cartPromoRow = document.getElementById("cartPromoRow");
+    const cartPromoSaving = document.getElementById("cartPromoSaving");
+    const cartPromoLabel = document.getElementById("cartPromoLabel");
+    if (cartPromoRow) {
+      cartPromoRow.style.display = promoApplied && !isEmpty ? "flex" : "none";
+    }
+    if (cartPromoSaving) cartPromoSaving.textContent = `Save ₹${discount}`;
+    if (cartPromoLabel) cartPromoLabel.textContent = `${promoCode} applied:`;
 
     // Announce to screen readers
     const announce = document.getElementById("cartAnnounce");
     if (announce) {
-      announce.textContent = `Cart updated: ${cartQty} item${cartQty > 1 ? "s" : ""}, total ₹${total}`;
+      announce.textContent = isEmpty
+        ? "Cart is now empty"
+        : `Cart updated: ${cartQty} item${cartQty > 1 ? "s" : ""}, total ₹${total}`;
     }
   }
+
+  /* ── PROMO CODE INPUT ────────────────────────── */
+  let promoCode = "";
+  const promoCodeInput = document.getElementById("promoCodeInput");
+  const promoApplyBtn = document.getElementById("promoApplyBtn");
+  const promoFeedback = document.getElementById("promoFeedback");
+
+  promoApplyBtn?.addEventListener("click", applyPromo);
+  promoCodeInput?.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") applyPromo();
+  });
+
+  function applyPromo() {
+    if (!promoCodeInput || !promoFeedback) return;
+    const entered = promoCodeInput.value.trim().toUpperCase();
+
+    if (!entered) {
+      promoFeedback.textContent = "Please enter a promo code.";
+      promoFeedback.className = "promo-feedback error";
+      return;
+    }
+
+    if (PROMO_CODES[entered] !== undefined) {
+      promoApplied = true;
+      promoDiscount = PROMO_CODES[entered];
+      promoCode = entered;
+      const pct = Math.round(promoDiscount * 100);
+      promoFeedback.textContent = `✓ ${entered} applied — ${pct}% off!`;
+      promoFeedback.className = "promo-feedback success";
+      promoCodeInput.value = entered;
+      promoCodeInput.disabled = true;
+      promoApplyBtn.textContent = "Applied";
+      promoApplyBtn.disabled = true;
+    } else {
+      promoApplied = false;
+      promoDiscount = 0;
+      promoFeedback.textContent = "Invalid promo code. Try NATURE10 or SAVE15.";
+      promoFeedback.className = "promo-feedback error";
+    }
+
+    updateCart();
+  }
+
+  /* ── COMPARISON TABLE SCROLL HINT ───────────── */
+  const comparisonScroll = document.getElementById("comparisonScroll");
+  const tableFadeMask = document.getElementById("tableFadeMask");
+  const tableScrollHint = document.getElementById("tableScrollHint");
+
+  function updateTableMask() {
+    if (!comparisonScroll || !tableFadeMask) return;
+    const { scrollLeft, scrollWidth, clientWidth } = comparisonScroll;
+    const isOverflowing = scrollWidth > clientWidth;
+    const atEnd = scrollLeft + clientWidth >= scrollWidth - 4;
+
+    tableFadeMask.style.display = isOverflowing && !atEnd ? "block" : "none";
+    if (tableScrollHint) {
+      tableScrollHint.style.display = isOverflowing ? "flex" : "none";
+    }
+  }
+
+  comparisonScroll?.addEventListener("scroll", updateTableMask, {
+    passive: true,
+  });
+  window.addEventListener("resize", updateTableMask);
+  // Run once after layout
+  setTimeout(updateTableMask, 500);
 
   /* ── MODAL FOCUS TRAP ────────────────────────── */
   function trapFocus(modal) {
@@ -371,6 +545,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const orderSuccess = document.getElementById("orderSuccess");
 
   document.getElementById("checkoutBtn")?.addEventListener("click", () => {
+    if (cartQty === 0) return;
     closeCart();
     orderSuccess?.classList.add("show");
     if (orderSuccess) trapFocus(orderSuccess);
@@ -380,13 +555,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 4500);
   });
 
-  // Close order modal via close button
   document.getElementById("closeOrderModal")?.addEventListener("click", () => {
     orderSuccess?.classList.remove("show");
     if (orderSuccess) releaseFocus(orderSuccess);
   });
 
-  // Close contact modal via close button
   const contactSuccessModal = document.getElementById("contactSuccess");
   document
     .getElementById("closeContactModal")
@@ -395,7 +568,6 @@ document.addEventListener("DOMContentLoaded", () => {
       if (contactSuccessModal) releaseFocus(contactSuccessModal);
     });
 
-  // Close modals on backdrop click
   [orderSuccess, contactSuccessModal].forEach((modal) => {
     modal?.addEventListener("click", (e) => {
       if (e.target === modal) {
@@ -405,7 +577,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Close modals on Escape key
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") {
       [orderSuccess, contactSuccessModal].forEach((modal) => {
@@ -417,7 +588,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  /* ── CONTACT FORM ───────────────────────────── */
+  /* ── CONTACT FORM ────────────────────────────── */
   const contactForm = document.getElementById("contactForm");
   const contactSuccess = document.getElementById("contactSuccess");
 
@@ -440,7 +611,6 @@ document.addEventListener("DOMContentLoaded", () => {
     return !message;
   }
 
-  // Validate on blur
   contactForm?.querySelectorAll("input, textarea").forEach((field) => {
     field.addEventListener("blur", () => validateField(field));
     field.addEventListener("input", () => {
@@ -450,8 +620,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   contactForm?.addEventListener("submit", async (e) => {
     e.preventDefault();
-
-    // Validate all fields before submit
     const fields = [...contactForm.querySelectorAll("input, textarea")];
     const valid = fields.map((f) => validateField(f)).every(Boolean);
     if (!valid) return;
@@ -471,9 +639,7 @@ document.addEventListener("DOMContentLoaded", () => {
         contactSuccess?.classList.add("show");
         if (contactSuccess) trapFocus(contactSuccess);
         contactForm.reset();
-        fields.forEach((f) => {
-          f.classList.remove("valid", "invalid");
-        });
+        fields.forEach((f) => f.classList.remove("valid", "invalid"));
         setTimeout(() => {
           contactSuccess?.classList.remove("show");
           if (contactSuccess) releaseFocus(contactSuccess);
@@ -489,7 +655,35 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  /* ── REVIEWS: SHOW MORE ─────────────────────── */
+  /* ── NEWSLETTER FORM (footer) ────────────────── */
+  const newsletterForm = document.getElementById("newsletterForm");
+  const newsletterMsg = document.getElementById("newsletterMsg");
+
+  newsletterForm?.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const emailInput = document.getElementById("newsletterEmail");
+    const val = emailInput?.value.trim();
+
+    if (!val || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)) {
+      if (newsletterMsg) {
+        newsletterMsg.textContent = "Please enter a valid email address.";
+        newsletterMsg.className = "footer-newsletter-msg error";
+      }
+      return;
+    }
+
+    if (newsletterMsg) {
+      newsletterMsg.textContent = "🌿 You're subscribed! Check your inbox.";
+      newsletterMsg.className = "footer-newsletter-msg";
+    }
+    if (emailInput) {
+      emailInput.value = "";
+      emailInput.disabled = true;
+    }
+    newsletterForm.querySelector("button").disabled = true;
+  });
+
+  /* ── REVIEWS: SHOW MORE ──────────────────────── */
   const showMoreBtn = document.getElementById("showMoreBtn");
   const hiddenReviews = document.querySelectorAll(".hidden-review");
   let showingAll = false;
@@ -517,7 +711,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  /* ── FAQ ACCORDION ──────────────────────────── */
+  /* ── FAQ ACCORDION ───────────────────────────── */
   document.querySelectorAll(".faq-q").forEach((btn) => {
     btn.addEventListener("click", () => {
       const item = btn.closest(".faq-item");
@@ -534,4 +728,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   });
+
+  // Initial cart render (empty state)
+  updateCart();
 }); // END DOMContentLoaded
