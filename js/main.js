@@ -1,4 +1,4 @@
-/* ── PAGE LOADER — reduced min display to 1500ms ── */
+/* ── PAGE LOADER ─────────────────────────────── */
 window.addEventListener("load", () => {
   const minDisplay = 1500;
   const loadStart = performance.now();
@@ -6,7 +6,6 @@ window.addEventListener("load", () => {
   const reveal = () => {
     const elapsed = performance.now() - loadStart;
     const wait = Math.max(0, minDisplay - elapsed);
-
     setTimeout(() => {
       document.body.classList.remove("loading");
       setTimeout(() => {
@@ -30,7 +29,6 @@ document.addEventListener("DOMContentLoaded", () => {
       anchorPlacement: "top-bottom",
     });
   }
-
   setTimeout(() => {
     document.querySelectorAll("[data-aos]").forEach((el) => {
       el.classList.add("aos-animate");
@@ -43,7 +41,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const themeIcon = document.getElementById("themeIcon");
   const html = document.documentElement;
 
-  // Restore saved preference
   const savedTheme = localStorage.getItem("hlc_theme") || "light";
   html.setAttribute("data-theme", savedTheme);
   updateThemeIcon(savedTheme);
@@ -55,19 +52,15 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   themeToggle?.addEventListener("click", () => {
-    const current = html.getAttribute("data-theme");
-    const next = current === "dark" ? "light" : "dark";
+    const next = html.getAttribute("data-theme") === "dark" ? "light" : "dark";
     html.setAttribute("data-theme", next);
     localStorage.setItem("hlc_theme", next);
     updateThemeIcon(next);
   });
 
   /* ── PROMO BANNER ────────────────────────────── */
-  const promoBanner = document.getElementById("promoBanner");
-  const promoClose = document.getElementById("promoClose");
-
-  promoClose?.addEventListener("click", () => {
-    promoBanner?.classList.add("hidden");
+  document.getElementById("promoClose")?.addEventListener("click", () => {
+    document.getElementById("promoBanner")?.classList.add("hidden");
   });
 
   /* ── NAVBAR ──────────────────────────────────── */
@@ -80,28 +73,18 @@ document.addEventListener("DOMContentLoaded", () => {
     const sy = window.scrollY;
     navbar?.classList.toggle("scrolled", sy > 20);
     backToTop?.classList.toggle("show", sy > 400);
-
     let current = "";
-    sections.forEach((section) => {
-      const sectionTop = section.offsetTop - 120;
-      const sectionHeight = section.offsetHeight;
-      if (sy >= sectionTop && sy < sectionTop + sectionHeight) {
-        current = section.getAttribute("id");
-      }
+    sections.forEach((s) => {
+      if (sy >= s.offsetTop - 120 && sy < s.offsetTop - 120 + s.offsetHeight)
+        current = s.id;
     });
-
-    navLinks.forEach((link) => {
-      link.classList.toggle(
-        "active",
-        link.getAttribute("href") === "#" + current,
-      );
-    });
-
+    navLinks.forEach((a) =>
+      a.classList.toggle("active", a.getAttribute("href") === "#" + current),
+    );
     animateRatingBars();
     animateScore();
     updateStickyBar();
   };
-
   window.addEventListener("scroll", onScroll, { passive: true });
 
   /* ── NAV SMOOTH SCROLL ───────────────────────── */
@@ -112,28 +95,24 @@ document.addEventListener("DOMContentLoaded", () => {
     a.addEventListener("click", (e) => {
       e.preventDefault();
       const target = document.getElementById(a.getAttribute("href").slice(1));
-
       if (target) {
         if (document.startViewTransition) {
-          document.startViewTransition(() => {
-            target.scrollIntoView({ behavior: "instant" });
-          });
+          document.startViewTransition(() =>
+            target.scrollIntoView({ behavior: "instant" }),
+          );
         } else {
           target.scrollIntoView({ behavior: "smooth" });
         }
       }
-
       navLinksEl?.classList.remove("open");
       hamburger?.classList.remove("open");
     });
   });
 
-  /* ── HAMBURGER ───────────────────────────────── */
   hamburger?.addEventListener("click", () => {
     hamburger.classList.toggle("open");
     navLinksEl?.classList.toggle("open");
   });
-
   document.addEventListener("click", (e) => {
     if (navbar && !navbar.contains(e.target)) {
       hamburger?.classList.remove("open");
@@ -141,31 +120,26 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  /* ── LEARN MORE ──────────────────────────────── */
   document.querySelector(".learn-more-btn")?.addEventListener("click", () => {
     document.getElementById("about")?.scrollIntoView({ behavior: "smooth" });
   });
 
-  /* ── BACK TO TOP ─────────────────────────────── */
-  backToTop?.addEventListener("click", () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  });
+  backToTop?.addEventListener("click", () =>
+    window.scrollTo({ top: 0, behavior: "smooth" }),
+  );
 
   /* ── MOBILE STICKY BUY BAR ───────────────────── */
   const stickyBuyBar = document.getElementById("stickyBuyBar");
   const heroSection = document.getElementById("home");
-
   function updateStickyBar() {
     if (!stickyBuyBar || !heroSection) return;
-    const heroBottom = heroSection.getBoundingClientRect().bottom;
-    stickyBuyBar.classList.toggle("show", heroBottom < 0);
+    stickyBuyBar.classList.toggle(
+      "show",
+      heroSection.getBoundingClientRect().bottom < 0,
+    );
   }
 
-  /* ── LAZY IMAGE LOADING ──────────────────────── */
-  // Hero product image is NOT lazy (eager + fetchpriority=high in HTML)
-  // Only observe remaining lazy images
-  const lazyImgs = document.querySelectorAll(".lazy-img");
-
+  /* ── LAZY IMAGES ─────────────────────────────── */
   const imgObserver = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
@@ -173,34 +147,31 @@ document.addEventListener("DOMContentLoaded", () => {
         const img = entry.target;
         const src = img.getAttribute("data-src");
         if (!src) return;
-
-        const tempImg = new Image();
-        tempImg.onload = () => {
+        const t = new Image();
+        t.onload = () => {
           img.src = src;
           img.classList.add("loaded");
         };
-        tempImg.src = src;
+        t.src = src;
         imgObserver.unobserve(img);
       });
     },
     { rootMargin: "100px" },
   );
+  document
+    .querySelectorAll(".lazy-img")
+    .forEach((img) => imgObserver.observe(img));
 
-  lazyImgs.forEach((img) => imgObserver.observe(img));
-
-  /* ── ANIMATED RATING BARS ────────────────────── */
+  /* ── RATING BARS ─────────────────────────────── */
   let barsAnimated = false;
   const reviewsSection = document.getElementById("reviews");
-
   function animateRatingBars() {
     if (barsAnimated || !reviewsSection) return;
-    const rect = reviewsSection.getBoundingClientRect();
-    if (rect.top < window.innerHeight - 100) {
+    if (reviewsSection.getBoundingClientRect().top < window.innerHeight - 100) {
       barsAnimated = true;
       document.querySelectorAll(".bar-fill").forEach((bar) => {
-        const target = bar.getAttribute("data-width");
         requestAnimationFrame(() => {
-          bar.style.width = target;
+          bar.style.width = bar.getAttribute("data-width");
         });
       });
     }
@@ -209,24 +180,18 @@ document.addEventListener("DOMContentLoaded", () => {
   /* ── SCORE COUNT-UP ──────────────────────────── */
   let scoreAnimated = false;
   const scoreEl = document.getElementById("scoreCount");
-
   function animateScore() {
     if (scoreAnimated || !scoreEl || !reviewsSection) return;
-    const rect = reviewsSection.getBoundingClientRect();
-    if (rect.top < window.innerHeight - 100) {
+    if (reviewsSection.getBoundingClientRect().top < window.innerHeight - 100) {
       scoreAnimated = true;
-      const target = 4.3;
-      const duration = 1400;
-      const startTime = performance.now();
-
+      const target = 4.3,
+        duration = 1400,
+        startTime = performance.now();
       const tick = (now) => {
-        const elapsed = now - startTime;
-        const progress = Math.min(elapsed / duration, 1);
-        const eased = 1 - Math.pow(1 - progress, 3);
-        scoreEl.textContent = (eased * target).toFixed(1);
-        if (progress < 1) requestAnimationFrame(tick);
+        const p = Math.min((now - startTime) / duration, 1);
+        scoreEl.textContent = ((1 - Math.pow(1 - p, 3)) * target).toFixed(1);
+        if (p < 1) requestAnimationFrame(tick);
       };
-
       requestAnimationFrame(tick);
     }
   }
@@ -236,30 +201,24 @@ document.addEventListener("DOMContentLoaded", () => {
   const shareMsg = document.getElementById("shareMsg");
 
   async function handleShare() {
-    const shareData = {
-      title: "Himalaya Lip Care — Natural Lip Balm",
-      text: "Check out this natural lip balm — cold-pressed botanical oils, PETA certified, just ₹50.",
-      url: window.location.href,
-    };
-
     if (navigator.share) {
       try {
-        await navigator.share(shareData);
+        await navigator.share({
+          title: "Himalaya Lip Care — Natural Lip Balm",
+          text: "Check out this natural lip balm — cold-pressed botanical oils, PETA certified, just ₹50.",
+          url: window.location.href,
+        });
         return;
       } catch (err) {
-        // User cancelled — do nothing
         if (err.name === "AbortError") return;
       }
     }
-
-    // Fallback: copy URL to clipboard
     try {
       await navigator.clipboard.writeText(window.location.href);
       if (shareMsg) shareMsg.textContent = "Link copied to clipboard!";
     } catch {
       if (shareMsg) shareMsg.textContent = "Copy this URL to share";
     }
-
     shareToast?.classList.add("show");
     setTimeout(() => shareToast?.classList.remove("show"), 2500);
   }
@@ -289,28 +248,23 @@ document.addEventListener("DOMContentLoaded", () => {
     wishlistNavIcon?.classList.toggle("fa-solid", wishlisted);
     wishlistNavBtn?.classList.toggle("active", wishlisted);
   }
-
   applyWishlistUI();
 
   function toggleWishlist() {
     wishlisted = !wishlisted;
     localStorage.setItem("hlc_wishlisted", wishlisted);
     applyWishlistUI();
-
     if (wishlisted && wishlistBtn) {
       wishlistBtn.classList.add("burst");
       setTimeout(() => wishlistBtn.classList.remove("burst"), 500);
     }
-
-    if (wishlistMsg) {
+    if (wishlistMsg)
       wishlistMsg.textContent = wishlisted
         ? "Added to wishlist!"
         : "Removed from wishlist";
-    }
     wishlistToast?.classList.add("show");
     setTimeout(() => wishlistToast?.classList.remove("show"), 2500);
   }
-
   wishlistBtn?.addEventListener("click", toggleWishlist);
   wishlistNavBtn?.addEventListener("click", toggleWishlist);
 
@@ -323,7 +277,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const qtyValueEl = document.querySelector(".qty-value");
   const cartBadge = document.getElementById("cartBadge");
   const cartHeaderSub = document.getElementById("cartHeaderSub");
-  const cartSubtotal = document.querySelector(".cartSubtotal");
+  const cartSubtotalEl = document.querySelector(".cartSubtotal");
   const totalEl = document.querySelector(".cartTotal");
   const cartItem = document.getElementById("cartItem");
   const cartEmpty = document.getElementById("cartEmpty");
@@ -333,20 +287,16 @@ document.addEventListener("DOMContentLoaded", () => {
   const PRICE = 50;
   let cartQty = 0;
   let promoApplied = false;
-  let promoDiscount = 0; // decimal e.g. 0.1 = 10%
+  let promoDiscount = 0;
+  let promoCode = "";
 
-  // Valid promo codes map  { CODE: discountFraction }
-  const PROMO_CODES = {
-    NATURE10: 0.1,
-    SAVE15: 0.15,
-  };
+  const PROMO_CODES = { NATURE10: 0.1, SAVE15: 0.15 };
 
   const openCart = () => {
     cartDrawer?.classList.add("show");
     cartOverlay?.classList.add("show");
     document.body.style.overflow = "hidden";
   };
-
   const closeCart = () => {
     cartDrawer?.classList.remove("show");
     cartOverlay?.classList.remove("show");
@@ -357,7 +307,6 @@ document.addEventListener("DOMContentLoaded", () => {
   closeCartBtn?.addEventListener("click", closeCart);
   cartOverlay?.addEventListener("click", closeCart);
 
-  // Add to cart buttons — adds 1 item and opens drawer
   document.querySelectorAll(".add-to-cart").forEach((btn) => {
     btn.addEventListener("click", () => {
       if (cartQty === 0) {
@@ -370,20 +319,16 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Quantity controls
   document.querySelector(".qty-btn.plus")?.addEventListener("click", () => {
     cartQty++;
     updateCart();
   });
-
   document.querySelector(".qty-btn.minus")?.addEventListener("click", () => {
     if (cartQty > 1) {
       cartQty--;
       updateCart();
     }
   });
-
-  // Remove item — empties the cart
   removeItemBtn?.addEventListener("click", () => {
     cartQty = 0;
     updateCart();
@@ -395,51 +340,38 @@ document.addEventListener("DOMContentLoaded", () => {
     const discount = promoApplied ? Math.round(subtotal * promoDiscount) : 0;
     const total = subtotal - discount;
 
-    // Toggle cart item vs empty state
     if (cartItem) cartItem.style.display = isEmpty ? "none" : "flex";
     if (cartEmpty) cartEmpty.style.display = isEmpty ? "flex" : "none";
     if (cartFooter) {
-      cartFooter.style.opacity = isEmpty ? "0.4" : "1";
+      cartFooter.style.opacity = isEmpty ? "0.45" : "1";
       cartFooter.style.pointerEvents = isEmpty ? "none" : "auto";
     }
-
-    // Show/hide remove button — only visible at qty 1
-    if (removeItemBtn) {
-      removeItemBtn.classList.toggle("visible", cartQty === 1);
-    }
-
-    // Badge shows 0 when empty
+    if (removeItemBtn) removeItemBtn.classList.toggle("visible", cartQty === 1);
     if (qtyValueEl) qtyValueEl.textContent = cartQty;
     if (cartBadge) cartBadge.textContent = cartQty;
-    if (cartSubtotal) cartSubtotal.textContent = subtotal;
+    if (cartSubtotalEl) cartSubtotalEl.textContent = subtotal;
     if (totalEl) totalEl.textContent = `₹${total}`;
-    if (cartHeaderSub) {
+    if (cartHeaderSub)
       cartHeaderSub.textContent = isEmpty
         ? "0 items"
         : `${cartQty} item${cartQty > 1 ? "s" : ""} · ₹${total}`;
-    }
 
-    // Promo row
     const cartPromoRow = document.getElementById("cartPromoRow");
     const cartPromoSaving = document.getElementById("cartPromoSaving");
     const cartPromoLabel = document.getElementById("cartPromoLabel");
-    if (cartPromoRow) {
+    if (cartPromoRow)
       cartPromoRow.style.display = promoApplied && !isEmpty ? "flex" : "none";
-    }
     if (cartPromoSaving) cartPromoSaving.textContent = `Save ₹${discount}`;
     if (cartPromoLabel) cartPromoLabel.textContent = `${promoCode} applied:`;
 
-    // Announce to screen readers
     const announce = document.getElementById("cartAnnounce");
-    if (announce) {
+    if (announce)
       announce.textContent = isEmpty
         ? "Cart is now empty"
         : `Cart updated: ${cartQty} item${cartQty > 1 ? "s" : ""}, total ₹${total}`;
-    }
   }
 
-  /* ── PROMO CODE INPUT ────────────────────────── */
-  let promoCode = "";
+  /* ── PROMO CODE ──────────────────────────────── */
   const promoCodeInput = document.getElementById("promoCodeInput");
   const promoApplyBtn = document.getElementById("promoApplyBtn");
   const promoFeedback = document.getElementById("promoFeedback");
@@ -452,7 +384,6 @@ document.addEventListener("DOMContentLoaded", () => {
   function applyPromo() {
     if (!promoCodeInput || !promoFeedback) return;
     const entered = promoCodeInput.value.trim().toUpperCase();
-
     if (!entered) {
       promoFeedback.textContent = "Please enter a promo code.";
       promoFeedback.className = "promo-feedback error";
@@ -463,8 +394,7 @@ document.addEventListener("DOMContentLoaded", () => {
       promoApplied = true;
       promoDiscount = PROMO_CODES[entered];
       promoCode = entered;
-      const pct = Math.round(promoDiscount * 100);
-      promoFeedback.textContent = `✓ ${entered} applied — ${pct}% off!`;
+      promoFeedback.textContent = `✓ ${entered} applied — ${Math.round(promoDiscount * 100)}% off!`;
       promoFeedback.className = "promo-feedback success";
       promoCodeInput.value = entered;
       promoCodeInput.disabled = true;
@@ -473,14 +403,13 @@ document.addEventListener("DOMContentLoaded", () => {
     } else {
       promoApplied = false;
       promoDiscount = 0;
-      promoFeedback.textContent = "Invalid promo code. Try NATURE10 or SAVE15.";
+      promoFeedback.textContent = "Invalid code. Try NATURE10 or SAVE15.";
       promoFeedback.className = "promo-feedback error";
     }
-
     updateCart();
   }
 
-  /* ── COMPARISON TABLE SCROLL HINT ───────────── */
+  /* ── COMPARISON TABLE SCROLL ─────────────────── */
   const comparisonScroll = document.getElementById("comparisonScroll");
   const tableFadeMask = document.getElementById("tableFadeMask");
   const tableScrollHint = document.getElementById("tableScrollHint");
@@ -488,38 +417,28 @@ document.addEventListener("DOMContentLoaded", () => {
   function updateTableMask() {
     if (!comparisonScroll || !tableFadeMask) return;
     const { scrollLeft, scrollWidth, clientWidth } = comparisonScroll;
-    const isOverflowing = scrollWidth > clientWidth;
+    const isOverflowing = scrollWidth > clientWidth + 2;
     const atEnd = scrollLeft + clientWidth >= scrollWidth - 4;
-
     tableFadeMask.style.display = isOverflowing && !atEnd ? "block" : "none";
-    if (tableScrollHint) {
+    if (tableScrollHint)
       tableScrollHint.style.display = isOverflowing ? "flex" : "none";
-    }
   }
-
   comparisonScroll?.addEventListener("scroll", updateTableMask, {
     passive: true,
   });
   window.addEventListener("resize", updateTableMask);
-  // Run once after layout
   setTimeout(updateTableMask, 500);
 
-  /* ── MODAL FOCUS TRAP ────────────────────────── */
+  /* ── FOCUS TRAP ──────────────────────────────── */
   function trapFocus(modal) {
     const focusable = modal.querySelectorAll(
       'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])',
     );
     const first = focusable[0];
     const last = focusable[focusable.length - 1];
-
     if (first) first.focus();
-
     modal._trapHandler = (e) => {
       if (e.key !== "Tab") return;
-      if (focusable.length === 0) {
-        e.preventDefault();
-        return;
-      }
       if (e.shiftKey) {
         if (document.activeElement === first) {
           e.preventDefault();
@@ -534,15 +453,15 @@ document.addEventListener("DOMContentLoaded", () => {
     };
     modal.addEventListener("keydown", modal._trapHandler);
   }
-
   function releaseFocus(modal) {
-    if (modal._trapHandler) {
+    if (modal._trapHandler)
       modal.removeEventListener("keydown", modal._trapHandler);
-    }
   }
 
-  /* ── CHECKOUT ────────────────────────────────── */
+  /* ── MODALS ──────────────────────────────────── */
   const orderSuccess = document.getElementById("orderSuccess");
+  const contactSuccessModal = document.getElementById("contactSuccess");
+  const modalReplyEmail = document.getElementById("modalReplyEmail");
 
   document.getElementById("checkoutBtn")?.addEventListener("click", () => {
     if (cartQty === 0) return;
@@ -552,15 +471,13 @@ document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => {
       orderSuccess?.classList.remove("show");
       if (orderSuccess) releaseFocus(orderSuccess);
-    }, 4500);
+    }, 5000);
   });
 
   document.getElementById("closeOrderModal")?.addEventListener("click", () => {
     orderSuccess?.classList.remove("show");
     if (orderSuccess) releaseFocus(orderSuccess);
   });
-
-  const contactSuccessModal = document.getElementById("contactSuccess");
   document
     .getElementById("closeContactModal")
     ?.addEventListener("click", () => {
@@ -576,7 +493,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   });
-
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") {
       [orderSuccess, contactSuccessModal].forEach((modal) => {
@@ -590,12 +506,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /* ── CONTACT FORM ────────────────────────────── */
   const contactForm = document.getElementById("contactForm");
-  const contactSuccess = document.getElementById("contactSuccess");
 
   function validateField(input) {
     const errorEl = document.getElementById(input.id + "Error");
     let message = "";
-
     if (!input.value.trim()) {
       message = "This field is required.";
     } else if (
@@ -604,7 +518,6 @@ document.addEventListener("DOMContentLoaded", () => {
     ) {
       message = "Please enter a valid email address.";
     }
-
     input.classList.toggle("invalid", !!message);
     input.classList.toggle("valid", !message && !!input.value.trim());
     if (errorEl) errorEl.textContent = message;
@@ -621,12 +534,15 @@ document.addEventListener("DOMContentLoaded", () => {
   contactForm?.addEventListener("submit", async (e) => {
     e.preventDefault();
     const fields = [...contactForm.querySelectorAll("input, textarea")];
-    const valid = fields.map((f) => validateField(f)).every(Boolean);
-    if (!valid) return;
+    if (!fields.map(validateField).every(Boolean)) return;
 
     const btn = contactForm.querySelector("button[type=submit]");
     btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending…';
     btn.disabled = true;
+
+    // Show email in modal
+    const emailVal = contactForm.querySelector("#email")?.value?.trim();
+    if (modalReplyEmail && emailVal) modalReplyEmail.textContent = emailVal;
 
     try {
       const res = await fetch(contactForm.action, {
@@ -634,16 +550,15 @@ document.addEventListener("DOMContentLoaded", () => {
         body: new FormData(contactForm),
         headers: { Accept: "application/json" },
       });
-
       if (res.ok) {
-        contactSuccess?.classList.add("show");
-        if (contactSuccess) trapFocus(contactSuccess);
+        contactSuccessModal?.classList.add("show");
+        if (contactSuccessModal) trapFocus(contactSuccessModal);
         contactForm.reset();
         fields.forEach((f) => f.classList.remove("valid", "invalid"));
         setTimeout(() => {
-          contactSuccess?.classList.remove("show");
-          if (contactSuccess) releaseFocus(contactSuccess);
-        }, 4500);
+          contactSuccessModal?.classList.remove("show");
+          if (contactSuccessModal) releaseFocus(contactSuccessModal);
+        }, 5000);
       } else {
         alert("Something went wrong. Please try again.");
       }
@@ -655,23 +570,22 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  /* ── NEWSLETTER FORM (footer) ────────────────── */
+  /* ── NEWSLETTER ──────────────────────────────── */
   const newsletterForm = document.getElementById("newsletterForm");
   const newsletterMsg = document.getElementById("newsletterMsg");
-
   newsletterForm?.addEventListener("submit", (e) => {
     e.preventDefault();
     const emailInput = document.getElementById("newsletterEmail");
-    const val = emailInput?.value.trim();
-
-    if (!val || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)) {
+    if (
+      !emailInput?.value.trim() ||
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailInput.value)
+    ) {
       if (newsletterMsg) {
-        newsletterMsg.textContent = "Please enter a valid email address.";
+        newsletterMsg.textContent = "Please enter a valid email.";
         newsletterMsg.className = "footer-newsletter-msg error";
       }
       return;
     }
-
     if (newsletterMsg) {
       newsletterMsg.textContent = "🌿 You're subscribed! Check your inbox.";
       newsletterMsg.className = "footer-newsletter-msg";
@@ -683,14 +597,12 @@ document.addEventListener("DOMContentLoaded", () => {
     newsletterForm.querySelector("button").disabled = true;
   });
 
-  /* ── REVIEWS: SHOW MORE ──────────────────────── */
+  /* ── SHOW MORE REVIEWS ───────────────────────── */
   const showMoreBtn = document.getElementById("showMoreBtn");
   const hiddenReviews = document.querySelectorAll(".hidden-review");
   let showingAll = false;
-
   showMoreBtn?.addEventListener("click", () => {
     showingAll = !showingAll;
-
     hiddenReviews.forEach((card, i) => {
       if (showingAll) {
         card.style.display = "flex";
@@ -701,27 +613,22 @@ document.addEventListener("DOMContentLoaded", () => {
         card.style.animation = "";
       }
     });
-
     showMoreBtn.innerHTML = showingAll
       ? '<i class="fa-solid fa-chevron-up"></i> Show Less'
       : '<i class="fa-solid fa-chevron-down"></i> Show More Reviews';
-
-    if (!showingAll) {
+    if (!showingAll)
       reviewsSection?.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
   });
 
-  /* ── FAQ ACCORDION ───────────────────────────── */
+  /* ── FAQ ─────────────────────────────────────── */
   document.querySelectorAll(".faq-q").forEach((btn) => {
     btn.addEventListener("click", () => {
       const item = btn.closest(".faq-item");
       const isOpen = item.classList.contains("open");
-
       document.querySelectorAll(".faq-item.open").forEach((el) => {
         el.classList.remove("open");
         el.querySelector(".faq-q")?.setAttribute("aria-expanded", "false");
       });
-
       if (!isOpen) {
         item.classList.add("open");
         btn.setAttribute("aria-expanded", "true");
@@ -729,6 +636,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Initial cart render (empty state)
+  /* Initial render */
   updateCart();
 }); // END DOMContentLoaded
