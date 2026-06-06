@@ -1,6 +1,6 @@
 /* ── PAGE LOADER ─────────────────────────────── */
 window.addEventListener("load", () => {
-  const minDisplay = 800;
+  const minDisplay = 1500;
   const loadStart = performance.now();
   const reveal = () => {
     const elapsed = performance.now() - loadStart;
@@ -81,7 +81,6 @@ document.addEventListener("DOMContentLoaded", () => {
     backToTop?.classList.toggle("show", sy > 400);
     updateScrollProgress();
     updateStickyBar();
-
     let current = "";
     sections.forEach((s) => {
       if (sy >= s.offsetTop - 120 && sy < s.offsetTop - 120 + s.offsetHeight)
@@ -375,6 +374,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
+  /* ── QTY BUTTONS ─────────────────────────────── */
   document.querySelector(".qty-btn.plus")?.addEventListener("click", () => {
     cartQty++;
     updateCart();
@@ -397,6 +397,28 @@ document.addEventListener("DOMContentLoaded", () => {
     return 0;
   }
 
+  function resetPromoUI() {
+    promoApplied = false;
+    promoDiscount = 0;
+    promoCode = "";
+    localStorage.removeItem("hlc_promo");
+    const inp = document.getElementById("promoCodeInput");
+    const btn = document.getElementById("promoApplyBtn");
+    const fb = document.getElementById("promoFeedback");
+    if (inp) {
+      inp.value = "";
+      inp.disabled = false;
+    }
+    if (btn) {
+      btn.textContent = "Apply";
+      btn.disabled = false;
+    }
+    if (fb) {
+      fb.textContent = "";
+      fb.className = "promo-feedback";
+    }
+  }
+
   function updateCart() {
     localStorage.setItem("hlc_cartQty", cartQty);
 
@@ -407,11 +429,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const discount = Math.round(subtotal * effectiveDisc);
     const total = subtotal - discount;
 
-    /* Show / hide cart item vs empty state */
+    /* Show/hide cart item vs empty state */
     cartItem?.classList.toggle("hidden", isEmpty);
     cartEmpty?.classList.toggle("hidden", !isEmpty);
 
-    /* Remove button */
+    /* Remove button — always visible when item is showing */
     if (removeItemBtn) removeItemBtn.style.display = isEmpty ? "none" : "flex";
 
     /* Promo wrap */
@@ -442,7 +464,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (qtyValueEl) qtyValueEl.textContent = cartQty;
     if (cartBadge) cartBadge.textContent = cartQty;
 
-    /* Item total price in row */
+    /* Live price in item row */
     const cartItemTotalPrice = document.querySelector(".cart-item-total-price");
     if (cartItemTotalPrice) cartItemTotalPrice.textContent = subtotal;
 
@@ -473,7 +495,7 @@ document.addEventListener("DOMContentLoaded", () => {
         : "₹50 · 10g";
     }
 
-    /* Screen reader announcement */
+    /* Screen reader */
     const announce = document.getElementById("cartAnnounce");
     if (announce)
       announce.textContent = isEmpty
@@ -574,9 +596,18 @@ document.addEventListener("DOMContentLoaded", () => {
   const reviewSuccessModal = document.getElementById("reviewSuccess");
   const modalReplyEmail = document.getElementById("modalReplyEmail");
 
+  /* FIXED: checkout resets cart fully */
   document.getElementById("checkoutBtn")?.addEventListener("click", () => {
     if (cartQty === 0) return;
     closeCart();
+
+    /* Reset cart state */
+    cartQty = 0;
+    localStorage.removeItem("hlc_cartQty");
+    resetPromoUI();
+    updateCart();
+
+    /* Show success modal */
     orderSuccess?.classList.add("show");
     if (orderSuccess) trapFocus(orderSuccess);
     setTimeout(() => {
@@ -788,7 +819,6 @@ document.addEventListener("DOMContentLoaded", () => {
     resetStars();
   });
 
-  /* Star picker */
   const starBtns = document.querySelectorAll(".star-pick");
   starBtns.forEach((btn) => {
     btn.addEventListener("click", () => {
