@@ -374,7 +374,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  /* ── QTY BUTTONS ─────────────────────────────── */
   document.querySelector(".qty-btn.plus")?.addEventListener("click", () => {
     cartQty++;
     updateCart();
@@ -429,23 +428,16 @@ document.addEventListener("DOMContentLoaded", () => {
     const discount = Math.round(subtotal * effectiveDisc);
     const total = subtotal - discount;
 
-    /* Show/hide cart item vs empty state */
     cartItem?.classList.toggle("hidden", isEmpty);
     cartEmpty?.classList.toggle("hidden", !isEmpty);
-
-    /* Remove button — always visible when item is showing */
     if (removeItemBtn) removeItemBtn.style.display = isEmpty ? "none" : "flex";
-
-    /* Promo wrap */
     cartPromoWrap?.classList.toggle("hidden", isEmpty);
 
-    /* Footer */
     if (cartFooter) {
       cartFooter.style.opacity = isEmpty ? "0.45" : "1";
       cartFooter.style.pointerEvents = isEmpty ? "none" : "auto";
     }
 
-    /* Qty tier nudge */
     if (qtyTierNudge && qtyTierMsg) {
       if (!isEmpty && cartQty < 3) {
         const need = 3 - cartQty;
@@ -460,11 +452,9 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
-    /* Qty display */
     if (qtyValueEl) qtyValueEl.textContent = cartQty;
     if (cartBadge) cartBadge.textContent = cartQty;
 
-    /* Live price in item row */
     const cartItemTotalPrice = document.querySelector(".cart-item-total-price");
     if (cartItemTotalPrice) cartItemTotalPrice.textContent = subtotal;
 
@@ -475,7 +465,6 @@ document.addEventListener("DOMContentLoaded", () => {
         ? "0 items"
         : `${cartQty} item${cartQty > 1 ? "s" : ""} · ₹${total}`;
 
-    /* Promo row */
     const cartPromoRow = document.getElementById("cartPromoRow");
     const cartPromoSaving = document.getElementById("cartPromoSaving");
     const cartPromoLabel = document.getElementById("cartPromoLabel");
@@ -488,14 +477,12 @@ document.addEventListener("DOMContentLoaded", () => {
           ? promoCode
           : "Tier (3+ units)";
 
-    /* Sticky bar price */
     if (stickyBuyPrice) {
       stickyBuyPrice.textContent = promoApplied
         ? `₹${PRICE - Math.round(PRICE * promoDiscount)} after ${promoCode} · 10g`
         : "₹50 · 10g";
     }
 
-    /* Screen reader */
     const announce = document.getElementById("cartAnnounce");
     if (announce)
       announce.textContent = isEmpty
@@ -596,18 +583,13 @@ document.addEventListener("DOMContentLoaded", () => {
   const reviewSuccessModal = document.getElementById("reviewSuccess");
   const modalReplyEmail = document.getElementById("modalReplyEmail");
 
-  /* FIXED: checkout resets cart fully */
   document.getElementById("checkoutBtn")?.addEventListener("click", () => {
     if (cartQty === 0) return;
     closeCart();
-
-    /* Reset cart state */
     cartQty = 0;
     localStorage.removeItem("hlc_cartQty");
     resetPromoUI();
     updateCart();
-
-    /* Show success modal */
     orderSuccess?.classList.add("show");
     if (orderSuccess) trapFocus(orderSuccess);
     setTimeout(() => {
@@ -640,7 +622,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  /* Escape closes cart + modals */
   document.addEventListener("keydown", (e) => {
     if (e.key !== "Escape") return;
     if (cartDrawer?.classList.contains("show")) {
@@ -790,7 +771,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const countEl = btn.querySelector(".helpful-count");
     let voted = localStorage.getItem(key) === "1";
     if (voted) btn.classList.add("voted");
-
     btn.addEventListener("click", () => {
       if (voted) return;
       voted = true;
@@ -884,10 +864,7 @@ document.addEventListener("DOMContentLoaded", () => {
     card.innerHTML = `
       <div class="review-top">
         <div class="review-avatar" style="--av-bg:${p.bg};--av-color:${p.col}">${initial}</div>
-        <div>
-          <h5>${name}</h5>
-          <div class="review-stars">${starsHtml}</div>
-        </div>
+        <div><h5>${name}</h5><div class="review-stars">${starsHtml}</div></div>
         <span class="review-date">Just now</span>
       </div>
       <p>"${text}"</p>
@@ -918,6 +895,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function toggleExpand() {
       const isOpen = card.classList.contains("expanded");
+      /* Close all others first */
       document.querySelectorAll(".ingredient-card.expanded").forEach((c) => {
         c.classList.remove("expanded");
         c.querySelector(".ingredient-overlay")?.setAttribute(
@@ -965,3 +943,4 @@ document.addEventListener("DOMContentLoaded", () => {
   updateCart();
   updateScrollProgress();
 }); // END DOMContentLoaded
+  
