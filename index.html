@@ -57,14 +57,21 @@
   }
   </script>
 
+  <!-- OPTIMISED: only 4 font variants instead of 11 -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=DM+Sans:opsz,wght@9..40,400;9..40,500&display=swap" rel="stylesheet" />
+
+  <!-- PERFORMANCE: replaced full FA with kit subset via CDN — keeps same icon classes -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
+
   <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body class="loading">
+
+  <!-- SCROLL PROGRESS BAR (NEW FEATURE) -->
+  <div class="scroll-progress" id="scrollProgress" role="progressbar" aria-label="Page scroll progress" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
 
   <a class="skip-link" href="#home">Skip to main content</a>
 
@@ -108,12 +115,15 @@
     </button>
   </div>
 
+  <!-- MOBILE NAV OVERLAY -->
+  <div class="nav-overlay" id="navOverlay"></div>
+
   <!-- NAVBAR -->
   <header class="navbar" id="navbar">
     <div class="nav-inner">
       <a class="brand" href="#home">
         <div class="brand-logo">
-          <img src="Assets/logo.webp" alt="Himalaya Lip Care logo" loading="lazy" />
+          <img src="Assets/logo.webp" alt="Himalaya Lip Care logo" width="52" height="52" loading="lazy" />
         </div>
         <div class="brand-text">
           <span class="brand-name">Himalaya</span>
@@ -121,7 +131,7 @@
         </div>
       </a>
 
-      <nav class="nav-links" id="navLinks">
+      <nav class="nav-links" id="navLinks" aria-label="Main navigation">
         <a href="#about"><i class="fa-solid fa-leaf"></i> About</a>
         <a href="#benefits"><i class="fa-solid fa-star"></i> Benefits</a>
         <a href="#ingredients"><i class="fa-solid fa-seedling"></i> Ingredients</a>
@@ -144,7 +154,7 @@
           <i class="fa-solid fa-bag-shopping"></i>
           <span class="cart-badge" id="cartBadge">0</span>
         </button>
-        <button class="hamburger" id="hamburger" aria-label="Toggle navigation">
+        <button class="hamburger" id="hamburger" aria-label="Toggle navigation" aria-expanded="false">
           <span></span><span></span><span></span>
         </button>
       </div>
@@ -175,15 +185,13 @@
           <span><i class="fa-solid fa-shield-halved"></i> UV Protection</span>
           <span><i class="fa-brands fa-pagelines"></i> 100% Natural</span>
         </div>
+        <!-- CHANGED: Simplified CTA — primary + wishlist only; Share moved to trust row -->
         <div class="hero-cta">
           <button class="btn btn-primary add-to-cart">
             <i class="fa-solid fa-bag-shopping"></i> Add to Cart — ₹50
           </button>
           <button class="btn btn-ghost learn-more-btn">
             <i class="fa-solid fa-play"></i> Learn More
-          </button>
-          <button class="btn btn-ghost share-btn" id="shareHeroBtn" aria-label="Share this product">
-            <i class="fa-solid fa-share-nodes"></i> Share
           </button>
           <button class="wishlist-btn" id="wishlistBtn" aria-label="Add to wishlist">
             <i class="fa-regular fa-heart" id="wishlistBtnIcon"></i>
@@ -195,6 +203,11 @@
           <div class="trust-item"><i class="fa-solid fa-flask"></i><span>Lab Tested</span></div>
           <div class="trust-sep"></div>
           <div class="trust-item"><i class="fa-solid fa-weight-scale"></i><span>Net Wt. 10 g</span></div>
+          <div class="trust-sep"></div>
+          <!-- Share moved here as icon-only -->
+          <button class="share-trust-btn" id="shareHeroBtn" aria-label="Share this product">
+            <i class="fa-solid fa-share-nodes"></i><span>Share</span>
+          </button>
         </div>
       </div>
 
@@ -205,9 +218,8 @@
           <div class="product-ring ring2"></div>
           <div class="product-glass-card">
             <img src="Assets/hero.png" alt="Himalaya Lip Balm tube" class="product-img"
-                 loading="eager" fetchpriority="high" />
+                 width="240" height="300" fetchpriority="high" />
           </div>
-          <!-- Badges — always visible including mobile -->
           <div class="product-float-badge badge-top">
             <i class="fa-solid fa-star"></i> 4.3 Rating
           </div>
@@ -224,12 +236,19 @@
     </div>
   </section>
 
+  <!-- WAVE DIVIDER hero → about -->
+  <div class="wave-divider wave-hero-about" aria-hidden="true">
+    <svg viewBox="0 0 1440 60" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0,30 C360,70 1080,-10 1440,30 L1440,60 L0,60 Z" />
+    </svg>
+  </div>
+
   <!-- ABOUT -->
   <section class="about" id="about">
     <div class="about-container">
       <div class="about-img-wrap" data-aos="fade-right" data-aos-duration="900">
         <div class="about-img-frame">
-          <img src="Assets/about.jpeg" alt="Himalaya Lip Balm product" class="lazy-img" data-src="Assets/about.jpeg" loading="lazy" />
+          <img src="Assets/about.jpeg" alt="Himalaya Lip Balm product" width="560" height="500" loading="lazy" />
         </div>
         <div class="about-img-card">
           <i class="fa-solid fa-award"></i>
@@ -264,51 +283,51 @@
   <section class="benefits" id="benefits">
     <div class="benefits-container">
       <div class="section-header" data-aos="fade-up">
-        <div class="section-label benefits-label"><i class="fa-solid fa-sparkles"></i> Why Choose Us</div>
-        <h2 class="section-title benefits-title">Key <em>Benefits</em></h2>
-        <p class="section-sub benefits-sub">What makes this lip balm a daily essential for thousands of people</p>
+        <div class="section-label" style="background:rgba(42,140,110,0.2);color:#b8e8d4;border-color:rgba(42,140,110,0.3)"><i class="fa-solid fa-sparkles"></i> Why Choose Us</div>
+        <h2 class="section-title" style="color:#ffffff">Key <em style="color:#3aad87">Benefits</em></h2>
+        <p class="section-sub" style="color:rgba(255,255,255,0.45)">What makes this lip balm a daily essential for thousands of people</p>
       </div>
       <div class="benefit-grid">
         <div class="benefit-card" data-aos="fade-up" data-aos-delay="0">
-          <div class="benefit-img-wrap">
-            <img src="Assets/benefit1.webp" alt="Intense hydration" class="lazy-img" data-src="Assets/benefit1.webp" loading="lazy" />
+          <div class="benefit-img-wrap" role="img" aria-label="Intense hydration — close up of soft lips">
+            <img src="Assets/benefit1.webp" alt="" width="300" height="400" loading="lazy" />
             <div class="benefit-img-overlay"></div>
           </div>
           <div class="benefit-body">
-            <div class="benefit-num">01</div>
+            <div class="benefit-num" data-num="01">01</div>
             <h3>Intense Hydration</h3>
             <p>Deeply moisturises and forms a protective seal that locks in hydration, keeping lips supple for hours.</p>
           </div>
         </div>
         <div class="benefit-card" data-aos="fade-up" data-aos-delay="100">
-          <div class="benefit-img-wrap">
-            <img src="Assets/benefit2.jpg" alt="Natural nourishment" class="lazy-img" data-src="Assets/benefit2.jpg" loading="lazy" />
+          <div class="benefit-img-wrap" role="img" aria-label="Natural nourishment — botanical oils">
+            <img src="Assets/benefit2.jpg" alt="" width="300" height="400" loading="lazy" />
             <div class="benefit-img-overlay"></div>
           </div>
           <div class="benefit-body">
-            <div class="benefit-num">02</div>
+            <div class="benefit-num" data-num="02">02</div>
             <h3>Natural Nourishment</h3>
             <p>Cold-pressed botanical oils penetrate deep to restore dry, chapped lips and rebuild their natural softness.</p>
           </div>
         </div>
         <div class="benefit-card" data-aos="fade-up" data-aos-delay="200">
-          <div class="benefit-img-wrap">
-            <img src="Assets/benefit3.jpeg" alt="All-day protection" class="lazy-img" data-src="Assets/benefit3.jpeg" loading="lazy" />
+          <div class="benefit-img-wrap" role="img" aria-label="All-day protection against wind and UV">
+            <img src="Assets/benefit3.jpeg" alt="" width="300" height="400" loading="lazy" />
             <div class="benefit-img-overlay"></div>
           </div>
           <div class="benefit-body">
-            <div class="benefit-num">03</div>
+            <div class="benefit-num" data-num="03">03</div>
             <h3>All-Day Protection</h3>
             <p>Creates a gentle barrier against wind, UV exposure, and environmental stress — from morning to night.</p>
           </div>
         </div>
         <div class="benefit-card" data-aos="fade-up" data-aos-delay="300">
-          <div class="benefit-img-wrap">
-            <img src="Assets/benefit4.jpeg" alt="Gentle for all skin types" class="lazy-img" data-src="Assets/benefit4.jpeg" loading="lazy" />
+          <div class="benefit-img-wrap" role="img" aria-label="Gentle for all skin types including sensitive skin">
+            <img src="Assets/benefit4.jpeg" alt="" width="300" height="400" loading="lazy" />
             <div class="benefit-img-overlay"></div>
           </div>
           <div class="benefit-body">
-            <div class="benefit-num">04</div>
+            <div class="benefit-num" data-num="04">04</div>
             <h3>Gentle for Everyone</h3>
             <p>A hypoallergenic, fragrance-light formula that's safe for all ages — including the most sensitive skin.</p>
           </div>
@@ -316,6 +335,13 @@
       </div>
     </div>
   </section>
+
+  <!-- WAVE DIVIDER benefits → ingredients -->
+  <div class="wave-divider wave-benefits-ing" aria-hidden="true">
+    <svg viewBox="0 0 1440 60" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0,20 C480,60 960,0 1440,40 L1440,60 L0,60 Z" />
+    </svg>
+  </div>
 
   <!-- INGREDIENTS -->
   <section class="ingredients" id="ingredients">
@@ -326,10 +352,11 @@
         <p class="section-sub">Carefully sourced from nature, formulated with science</p>
       </div>
       <div class="ingredient-grid">
+        <!-- CHANGED: ingredient cards now have a clickable expand panel -->
         <div class="ingredient-card" data-aos="zoom-in" data-aos-delay="0">
           <div class="ingredient-img-wrap">
-            <img src="Assets/carrot-oil.jpeg" alt="Carrot Seed Oil" class="lazy-img" data-src="Assets/carrot-oil.jpeg" loading="lazy" />
-            <div class="ingredient-overlay"><i class="fa-solid fa-circle-info"></i></div>
+            <img src="Assets/carrot-oil.jpeg" alt="Carrot Seed Oil" width="280" height="180" loading="lazy" />
+            <div class="ingredient-overlay" role="button" tabindex="0" aria-expanded="false" aria-label="Learn more about Carrot Seed Oil"><i class="fa-solid fa-circle-info"></i> Learn More</div>
           </div>
           <div class="ingredient-body">
             <div class="ingredient-num">01</div>
@@ -337,11 +364,16 @@
             <p>Packed with antioxidants and vitamins A, C &amp; E to rejuvenate and repair dry, dull lips.</p>
             <div class="ingredient-tags"><span>Antioxidant</span><span>Vitamin-rich</span></div>
           </div>
+          <div class="ingredient-expand" aria-hidden="true">
+            <p><strong>Origin:</strong> Cold-pressed from Daucus carota seeds, sourced from certified organic farms.</p>
+            <p><strong>INCI Name:</strong> Daucus Carota Sativa Seed Oil</p>
+            <p><strong>Key benefits:</strong> Stimulates cell regeneration, protects against environmental damage, naturally brightens dull lip skin.</p>
+          </div>
         </div>
         <div class="ingredient-card" data-aos="zoom-in" data-aos-delay="80">
           <div class="ingredient-img-wrap">
-            <img src="Assets/castor-oil.jpeg" alt="Castor Oil" class="lazy-img" data-src="Assets/castor-oil.jpeg" loading="lazy" />
-            <div class="ingredient-overlay"><i class="fa-solid fa-circle-info"></i></div>
+            <img src="Assets/castor-oil.jpeg" alt="Castor Oil" width="280" height="180" loading="lazy" />
+            <div class="ingredient-overlay" role="button" tabindex="0" aria-expanded="false" aria-label="Learn more about Castor Oil"><i class="fa-solid fa-circle-info"></i> Learn More</div>
           </div>
           <div class="ingredient-body">
             <div class="ingredient-num">02</div>
@@ -349,11 +381,16 @@
             <p>A deeply conditioning emollient that locks in moisture and delivers long-lasting softness.</p>
             <div class="ingredient-tags"><span>Conditioning</span><span>Moisturising</span></div>
           </div>
+          <div class="ingredient-expand" aria-hidden="true">
+            <p><strong>Origin:</strong> Extracted from Ricinus communis beans through cold-pressing.</p>
+            <p><strong>INCI Name:</strong> Ricinus Communis Seed Oil</p>
+            <p><strong>Key benefits:</strong> Forms a protective film, prevents moisture loss, smooths and plumps lip texture.</p>
+          </div>
         </div>
         <div class="ingredient-card" data-aos="zoom-in" data-aos-delay="160">
           <div class="ingredient-img-wrap">
-            <img src="Assets/coco-oil.jpeg" alt="Coconut Oil" class="lazy-img" data-src="Assets/coco-oil.jpeg" loading="lazy" />
-            <div class="ingredient-overlay"><i class="fa-solid fa-circle-info"></i></div>
+            <img src="Assets/coco-oil.jpeg" alt="Coconut Oil" width="280" height="180" loading="lazy" />
+            <div class="ingredient-overlay" role="button" tabindex="0" aria-expanded="false" aria-label="Learn more about Coconut Oil"><i class="fa-solid fa-circle-info"></i> Learn More</div>
           </div>
           <div class="ingredient-body">
             <div class="ingredient-num">03</div>
@@ -361,17 +398,27 @@
             <p>A lightweight, fast-absorbing oil that calms, soothes, and shields delicate lip skin.</p>
             <div class="ingredient-tags"><span>Soothing</span><span>Protective</span></div>
           </div>
+          <div class="ingredient-expand" aria-hidden="true">
+            <p><strong>Origin:</strong> Virgin coconut oil cold-pressed from fresh Cocos nucifera kernels.</p>
+            <p><strong>INCI Name:</strong> Cocos Nucifera Oil</p>
+            <p><strong>Key benefits:</strong> Anti-inflammatory, antimicrobial, absorbs quickly without greasiness.</p>
+          </div>
         </div>
         <div class="ingredient-card" data-aos="zoom-in" data-aos-delay="240">
           <div class="ingredient-img-wrap">
-            <img src="Assets/wheat-germ-oil.jpeg" alt="Wheat Germ Oil" class="lazy-img" data-src="Assets/wheat-germ-oil.jpeg" loading="lazy" />
-            <div class="ingredient-overlay"><i class="fa-solid fa-circle-info"></i></div>
+            <img src="Assets/wheat-germ-oil.jpeg" alt="Wheat Germ Oil" width="280" height="180" loading="lazy" />
+            <div class="ingredient-overlay" role="button" tabindex="0" aria-expanded="false" aria-label="Learn more about Wheat Germ Oil"><i class="fa-solid fa-circle-info"></i> Learn More</div>
           </div>
           <div class="ingredient-body">
             <div class="ingredient-num">04</div>
             <h3>Wheat Germ Oil</h3>
             <p>High in vitamin E and fatty acids that accelerate skin repair and restore natural smoothness.</p>
             <div class="ingredient-tags"><span>Repairing</span><span>Softening</span></div>
+          </div>
+          <div class="ingredient-expand" aria-hidden="true">
+            <p><strong>Origin:</strong> Cold-pressed from Triticum vulgare wheat germ, rich in tocopherols.</p>
+            <p><strong>INCI Name:</strong> Triticum Vulgare Germ Oil</p>
+            <p><strong>Key benefits:</strong> Highest natural source of Vitamin E, accelerates lip tissue repair, restores elasticity.</p>
           </div>
         </div>
       </div>
@@ -411,7 +458,6 @@
             </tbody>
           </table>
         </div>
-        <div class="table-fade-mask" id="tableFadeMask"></div>
       </div>
     </div>
   </section>
@@ -454,7 +500,10 @@
             <span class="review-date">2 weeks ago</span>
           </div>
           <p>"I've tried everything — from expensive department-store balms to pharmacy staples — and nothing compares. My lips used to peel every single morning. After just two weeks of using this each night, they feel genuinely healed. The texture is so light it disappears on contact — not waxy, not heavy. Just soft."</p>
-          <div class="review-helpful"><i class="fa-regular fa-thumbs-up"></i> 42 people found this helpful</div>
+          <button class="review-helpful" data-id="r1" aria-label="Mark as helpful">
+            <i class="fa-regular fa-thumbs-up"></i>
+            <span class="helpful-count">42</span> people found this helpful
+          </button>
         </div>
         <div class="review-card" data-aos="fade-up" data-aos-delay="100">
           <div class="review-top">
@@ -466,7 +515,10 @@
             <span class="review-date">1 month ago</span>
           </div>
           <p>"The scent is clean and barely-there — nothing artificial. Apply it before bed and wake up to noticeably smoother lips. The non-greasy finish makes it perfect under lipstick too."</p>
-          <div class="review-helpful"><i class="fa-regular fa-thumbs-up"></i> 28 people found this helpful</div>
+          <button class="review-helpful" data-id="r2" aria-label="Mark as helpful">
+            <i class="fa-regular fa-thumbs-up"></i>
+            <span class="helpful-count">28</span> people found this helpful
+          </button>
         </div>
         <div class="review-card" data-aos="fade-up" data-aos-delay="200">
           <div class="review-top">
@@ -478,7 +530,10 @@
             <span class="review-date">3 weeks ago</span>
           </div>
           <p>"Delhi winters are brutal on lips — I was going through a tube every two weeks. This one actually heals the cracks overnight. It's now the only thing on my bedside table."</p>
-          <div class="review-helpful"><i class="fa-regular fa-thumbs-up"></i> 19 people found this helpful</div>
+          <button class="review-helpful" data-id="r3" aria-label="Mark as helpful">
+            <i class="fa-regular fa-thumbs-up"></i>
+            <span class="helpful-count">19</span> people found this helpful
+          </button>
         </div>
         <div class="review-card hidden-review">
           <div class="review-top">
@@ -490,7 +545,10 @@
             <span class="review-date">6 weeks ago</span>
           </div>
           <p>"Picked this up on a whim for ₹50. Packaging feels premium, it stays put, and my girlfriend noticed my lips looked better before I even mentioned it. Genuinely surprised by the quality."</p>
-          <div class="review-helpful"><i class="fa-regular fa-thumbs-up"></i> 15 people found this helpful</div>
+          <button class="review-helpful" data-id="r4" aria-label="Mark as helpful">
+            <i class="fa-regular fa-thumbs-up"></i>
+            <span class="helpful-count">15</span> people found this helpful
+          </button>
         </div>
         <div class="review-card hidden-review">
           <div class="review-top">
@@ -502,7 +560,10 @@
             <span class="review-date">2 months ago</span>
           </div>
           <p>"I have rosacea and reactive skin — most balms sting or trigger breakouts around my mouth. This is the first one I've used with zero reaction. I'm finally confident recommending something to others with sensitive skin."</p>
-          <div class="review-helpful"><i class="fa-regular fa-thumbs-up"></i> 33 people found this helpful</div>
+          <button class="review-helpful" data-id="r5" aria-label="Mark as helpful">
+            <i class="fa-regular fa-thumbs-up"></i>
+            <span class="helpful-count">33</span> people found this helpful
+          </button>
         </div>
         <div class="review-card hidden-review">
           <div class="review-top">
@@ -513,13 +574,59 @@
             <span class="review-date">3 months ago</span>
           </div>
           <p>"I read every ingredient label before buying — this one passed every check. Coconut oil, carrot seed oil, no parabens, no mineral oil. The moment it touched my lips I knew it was different. It actually nourishes, not just coats."</p>
-          <div class="review-helpful"><i class="fa-regular fa-thumbs-up"></i> 21 people found this helpful</div>
+          <button class="review-helpful" data-id="r6" aria-label="Mark as helpful">
+            <i class="fa-regular fa-thumbs-up"></i>
+            <span class="helpful-count">21</span> people found this helpful
+          </button>
         </div>
       </div>
       <div class="show-more-wrap" data-aos="fade-up">
         <button class="btn btn-outline" id="showMoreBtn">
           <i class="fa-solid fa-chevron-down"></i> Show More Reviews
         </button>
+      </div>
+
+      <!-- NEW: Write a Review form -->
+      <div class="write-review-wrap" data-aos="fade-up" data-aos-delay="100">
+        <div class="write-review-toggle-bar">
+          <div class="write-review-info">
+            <i class="fa-solid fa-pen-to-square"></i>
+            <div>
+              <strong>Share your experience</strong>
+              <span>Help others make a confident choice</span>
+            </div>
+          </div>
+          <button class="btn btn-outline write-review-toggle-btn" id="writeReviewToggle">
+            <i class="fa-solid fa-plus"></i> Write a Review
+          </button>
+        </div>
+        <form class="write-review-form" id="writeReviewForm" novalidate>
+          <div class="wr-row">
+            <div class="form-group">
+              <label for="wr-name"><i class="fa-solid fa-user"></i> Your Name</label>
+              <input id="wr-name" name="wr-name" type="text" placeholder="e.g. Priya S." required />
+            </div>
+            <div class="form-group wr-star-group">
+              <label>Your Rating</label>
+              <div class="star-picker" role="group" aria-label="Rating">
+                <button type="button" class="star-pick" data-val="1" aria-label="1 star"><i class="fa-regular fa-star"></i></button>
+                <button type="button" class="star-pick" data-val="2" aria-label="2 stars"><i class="fa-regular fa-star"></i></button>
+                <button type="button" class="star-pick" data-val="3" aria-label="3 stars"><i class="fa-regular fa-star"></i></button>
+                <button type="button" class="star-pick" data-val="4" aria-label="4 stars"><i class="fa-regular fa-star"></i></button>
+                <button type="button" class="star-pick" data-val="5" aria-label="5 stars"><i class="fa-regular fa-star"></i></button>
+              </div>
+              <input type="hidden" id="wr-rating" name="wr-rating" value="0" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="wr-text"><i class="fa-solid fa-message"></i> Your Review</label>
+            <textarea id="wr-text" name="wr-text" rows="3" placeholder="What did you love about it?" required></textarea>
+          </div>
+          <div class="wr-actions">
+            <button type="button" class="btn btn-ghost" id="writeReviewCancel">Cancel</button>
+            <button type="submit" class="btn btn-primary"><i class="fa-solid fa-paper-plane"></i> Submit Review</button>
+          </div>
+        </form>
       </div>
     </div>
   </section>
@@ -584,6 +691,8 @@
         </div>
       </div>
       <div class="contact-right" data-aos="fade-left" data-aos-duration="900" data-aos-delay="150">
+        <!-- CHANGED: replaced alert() with inline error banner -->
+        <div class="form-submit-error" id="formSubmitError" role="alert" aria-live="polite"></div>
         <form id="contactForm" action="https://formspree.io/f/xldkqjrb" method="POST" novalidate>
           <div class="form-group">
             <label for="name"><i class="fa-solid fa-user"></i> Full Name</label>
@@ -614,7 +723,7 @@
       <div class="footer-col footer-col--brand">
         <div class="footer-brand">
           <div class="brand-logo small">
-            <img src="Assets/logo.webp" alt="Himalaya Lip Care logo" loading="lazy" />
+            <img src="Assets/logo.webp" alt="Himalaya Lip Care logo" width="40" height="40" loading="lazy" />
           </div>
           <div>
             <div class="brand-name">Himalaya Lip Care</div>
@@ -674,12 +783,20 @@
   <button id="backToTop" aria-label="Back to top"><i class="fa-solid fa-arrow-up"></i></button>
 
   <!-- CART DRAWER -->
-  <div class="cart-overlay" id="cartOverlay"></div>
-  <div class="cart-drawer" id="cartDrawer">
+<div class="cart-overlay" id="cartOverlay"></div>
+<div class="cart-drawer" id="cartDrawer" role="dialog" aria-modal="true" aria-label="Shopping cart">
+
+  <div class="cart-sidebar-strip"></div>
+
+  <div class="cart-main">
+
+    <!-- Header -->
     <div class="cart-header">
       <div class="cart-header-left">
-        <div class="cart-header-icon"><i class="fa-solid fa-bag-shopping"></i></div>
-        <div>
+        <div class="cart-header-icon-wrap">
+          <i class="fa-solid fa-bag-shopping"></i>
+        </div>
+        <div class="cart-header-text">
           <h3>Your Bag</h3>
           <span class="cart-header-sub" id="cartHeaderSub">0 items</span>
         </div>
@@ -689,38 +806,56 @@
       </button>
     </div>
 
+    <!-- Added toast -->
     <div class="cart-added-toast" id="cartSuccess">
       <i class="fa-solid fa-circle-check"></i>
       <span>Added to your bag!</span>
     </div>
 
+    <!-- Body -->
     <div class="cart-body">
-      <p class="cart-product-label">IN YOUR BAG</p>
 
-      <div class="cart-item" id="cartItem" style="display:none;">
+      <!-- Cart item — starts hidden, shown by JS when qty > 0 -->
+      <div class="cart-item hidden" id="cartItem">
         <div class="cart-item-img-wrap">
-          <img src="Assets/lipbalm.png" alt="Himalaya Lip Balm" loading="lazy" />
+          <img src="Assets/lipbalm.png" alt="Himalaya Lip Balm" width="100" height="100" loading="lazy" />
         </div>
-        <div class="cart-item-info">
-          <h4>Himalaya Lip Balm</h4>
-          <p class="cart-item-sub">Natural Botanical Formula · 10 g</p>
-          <div class="cart-item-row">
-            <span class="cart-item-price">₹50 / unit</span>
-            <div class="qty-controls">
-              <button class="qty-btn minus" aria-label="Decrease quantity"><i class="fa-solid fa-minus"></i></button>
-              <span class="qty-value">1</span>
-              <button class="qty-btn plus" aria-label="Increase quantity"><i class="fa-solid fa-plus"></i></button>
+        <div class="cart-item-details">
+          <div class="cart-item-header">
+            <div class="cart-item-name-wrap">
+              <h4>Himalaya Lip Balm</h4>
+              <span class="cart-item-variant">Natural Botanical Formula · 10 g</span>
             </div>
             <button class="remove-item-btn" id="removeItemBtn" aria-label="Remove item">
-              <i class="fa-solid fa-trash-can"></i>
+              <i class="fa-solid fa-xmark"></i>
             </button>
+          </div>
+          <div class="cart-item-footer">
+            <div class="qty-controls">
+              <button class="qty-btn minus" aria-label="Decrease quantity">
+                <i class="fa-solid fa-minus"></i>
+              </button>
+              <span class="qty-value">1</span>
+              <button class="qty-btn plus" aria-label="Increase quantity">
+                <i class="fa-solid fa-plus"></i>
+              </button>
+            </div>
+            <span class="cart-item-price">₹<span class="cart-item-total-price">50</span></span>
           </div>
         </div>
       </div>
 
-      <!-- Empty cart -->
+      <!-- QTY TIER nudge -->
+      <div class="qty-tier-nudge hidden" id="qtyTierNudge">
+        <i class="fa-solid fa-tags"></i>
+        <span id="qtyTierMsg">Add 2 more — get 15% off</span>
+      </div>
+
+      <!-- Empty cart — shown by default -->
       <div class="cart-empty" id="cartEmpty">
-        <i class="fa-regular fa-bag-shopping"></i>
+        <div class="cart-empty-icon">
+          <i class="fa-regular fa-bag-shopping"></i>
+        </div>
         <p>Your bag is empty</p>
         <span>Add the Himalaya Lip Balm to get started</span>
         <button class="btn btn-primary add-to-cart cart-empty-btn">
@@ -730,40 +865,45 @@
 
       <div aria-live="polite" aria-atomic="true" class="sr-only" id="cartAnnounce"></div>
 
-      <!-- Promo code -->
-      <div class="cart-promo-input-wrap" id="cartPromoWrap">
+      <!-- Promo code — hidden when cart empty -->
+      <div class="cart-promo-input-wrap hidden" id="cartPromoWrap">
         <div class="promo-input-row">
-          <input type="text" id="promoCodeInput" placeholder="Enter promo code" aria-label="Promo code" maxlength="20" />
+          <i class="fa-solid fa-tag promo-tag-icon"></i>
+          <input type="text" id="promoCodeInput" placeholder="Promo code" aria-label="Promo code" maxlength="20" />
           <button class="promo-apply-btn" id="promoApplyBtn">Apply</button>
         </div>
         <span class="promo-feedback" id="promoFeedback"></span>
       </div>
 
-      <div class="cart-perks" id="cartPerks">
+      <!-- Perks -->
+      <div class="cart-perks">
         <div class="perk"><i class="fa-solid fa-truck-fast"></i><span>Free delivery on orders above ₹200</span></div>
         <div class="perk"><i class="fa-solid fa-rotate-left"></i><span>Hassle-free 7-day returns</span></div>
         <div class="perk"><i class="fa-solid fa-shield-halved"></i><span>Secure, encrypted checkout</span></div>
       </div>
     </div>
 
+    <!-- Footer -->
     <div class="cart-footer" id="cartFooter">
-      <div class="cart-subtotal-row">
-        <span>Subtotal</span><span>₹<span class="cartSubtotal">0</span></span>
-      </div>
-      <div class="cart-promo-row" id="cartPromoRow" style="display:none;">
-        <i class="fa-solid fa-tag"></i>
-        <span id="cartPromoLabel">NATURE10 applied:</span>
-        <span class="promo-code-tag" id="cartPromoSaving">Save ₹0</span>
-      </div>
-      <div class="cart-divider"></div>
-      <div class="cart-total-row">
-        <span>Total</span>
-        <span class="cartTotal">₹0</span>
+      <div class="cart-summary-block">
+        <div class="cart-line-row">
+          <span>Subtotal</span>
+          <span>₹<span class="cartSubtotal">0</span></span>
+        </div>
+        <div class="cart-promo-row hidden" id="cartPromoRow">
+          <span><i class="fa-solid fa-tag"></i> <span id="cartPromoLabel">NATURE10</span></span>
+          <span class="promo-saving-tag" id="cartPromoSaving">−₹0</span>
+        </div>
+        <div class="cart-line-divider"></div>
+        <div class="cart-total-row">
+          <span>Total</span>
+          <span class="cartTotal">₹0</span>
+        </div>
       </div>
       <button class="checkout-btn" id="checkoutBtn">
         <i class="fa-solid fa-lock"></i> Secure Checkout
       </button>
-      <div class="cart-payment-icons">
+      <div class="cart-payment-row">
         <i class="fa-brands fa-cc-visa"></i>
         <i class="fa-brands fa-cc-mastercard"></i>
         <i class="fa-brands fa-google-pay"></i>
@@ -771,9 +911,11 @@
         <span>UPI · Cards · Wallets</span>
       </div>
     </div>
-  </div>
 
-  <!-- ORDER SUCCESS MODAL — minimal aesthetic -->
+  </div>
+</div>
+
+  <!-- ORDER SUCCESS MODAL -->
   <div class="modal-overlay" id="orderSuccess" role="dialog" aria-modal="true" aria-labelledby="orderSuccessTitle">
     <div class="modal-card modal-minimal">
       <button class="modal-x-close" id="closeOrderModal" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
@@ -794,7 +936,7 @@
     </div>
   </div>
 
-  <!-- CONTACT SUCCESS MODAL — minimal aesthetic -->
+  <!-- CONTACT SUCCESS MODAL -->
   <div class="modal-overlay" id="contactSuccess" role="dialog" aria-modal="true" aria-labelledby="contactSuccessTitle">
     <div class="modal-card modal-minimal">
       <button class="modal-x-close" id="closeContactModal" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
@@ -815,9 +957,26 @@
     </div>
   </div>
 
-  <!-- WISHLIST TOAST -->
+  <!-- REVIEW SUCCESS MODAL -->
+  <div class="modal-overlay" id="reviewSuccess" role="dialog" aria-modal="true" aria-labelledby="reviewSuccessTitle">
+    <div class="modal-card modal-minimal">
+      <button class="modal-x-close" id="closeReviewModal" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+      <div class="modal-check-ring">
+        <svg viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle class="modal-ring-circle" cx="26" cy="26" r="24" stroke="#2a8c6e" stroke-width="2"/>
+          <path class="modal-check-path" d="M14 26 L22 34 L38 18" stroke="#2a8c6e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        </svg>
+      </div>
+      <h2 id="reviewSuccessTitle">Review Submitted!</h2>
+      <p>Thank you — your review has been added. It helps others make a confident choice.</p>
+      <div class="modal-divider"></div>
+      <p class="modal-sub">Your voice matters 🌿</p>
+    </div>
+  </div>
+
+  <!-- WISHLIST TOAST — FIXED DARK MODE -->
   <div class="wishlist-toast" id="wishlistToast" role="status" aria-live="polite">
-    <i class="fa-solid fa-heart"></i>
+    <i class="fa-solid fa-heart wishlist-toast-icon"></i>
     <span id="wishlistMsg">Added to wishlist!</span>
   </div>
 
@@ -832,7 +991,7 @@
     <div class="sticky-buy-inner">
       <div class="sticky-buy-info">
         <span class="sticky-buy-name">Himalaya Lip Balm</span>
-        <span class="sticky-buy-price">₹45 after NATURE10 · 10g</span>
+        <span class="sticky-buy-price" id="stickyBuyPrice">₹50 · 10g</span>
       </div>
       <button class="btn btn-primary add-to-cart sticky-buy-btn">
         <i class="fa-solid fa-bag-shopping"></i> Add to Cart

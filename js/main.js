@@ -1,8 +1,7 @@
 /* ── PAGE LOADER ─────────────────────────────── */
 window.addEventListener("load", () => {
-  const minDisplay = 1500;
+  const minDisplay = 800;
   const loadStart = performance.now();
-
   const reveal = () => {
     const elapsed = performance.now() - loadStart;
     const wait = Math.max(0, minDisplay - elapsed);
@@ -14,7 +13,6 @@ window.addEventListener("load", () => {
       }, 800);
     }, wait);
   };
-
   reveal();
 });
 
@@ -29,12 +27,6 @@ document.addEventListener("DOMContentLoaded", () => {
       anchorPlacement: "top-bottom",
     });
   }
-  setTimeout(() => {
-    document.querySelectorAll("[data-aos]").forEach((el) => {
-      el.classList.add("aos-animate");
-      el.style.pointerEvents = "auto";
-    });
-  }, 4000);
 
   /* ── DARK MODE ───────────────────────────────── */
   const themeToggle = document.getElementById("themeToggle");
@@ -58,6 +50,17 @@ document.addEventListener("DOMContentLoaded", () => {
     updateThemeIcon(next);
   });
 
+  /* ── SCROLL PROGRESS BAR ─────────────────────── */
+  const scrollProgress = document.getElementById("scrollProgress");
+  function updateScrollProgress() {
+    if (!scrollProgress) return;
+    const pct =
+      (window.scrollY / (document.body.scrollHeight - window.innerHeight)) *
+      100;
+    scrollProgress.style.width = Math.min(pct, 100) + "%";
+    scrollProgress.setAttribute("aria-valuenow", Math.round(pct));
+  }
+
   /* ── PROMO BANNER ────────────────────────────── */
   document.getElementById("promoClose")?.addEventListener("click", () => {
     document.getElementById("promoBanner")?.classList.add("hidden");
@@ -68,11 +71,17 @@ document.addEventListener("DOMContentLoaded", () => {
   const sections = document.querySelectorAll("section[id]");
   const navLinks = document.querySelectorAll(".nav-links a");
   const backToTop = document.getElementById("backToTop");
+  const hamburger = document.getElementById("hamburger");
+  const navLinksEl = document.getElementById("navLinks");
+  const navOverlay = document.getElementById("navOverlay");
 
   const onScroll = () => {
     const sy = window.scrollY;
     navbar?.classList.toggle("scrolled", sy > 20);
     backToTop?.classList.toggle("show", sy > 400);
+    updateScrollProgress();
+    updateStickyBar();
+
     let current = "";
     sections.forEach((s) => {
       if (sy >= s.offsetTop - 120 && sy < s.offsetTop - 120 + s.offsetHeight)
@@ -81,16 +90,10 @@ document.addEventListener("DOMContentLoaded", () => {
     navLinks.forEach((a) =>
       a.classList.toggle("active", a.getAttribute("href") === "#" + current),
     );
-    animateRatingBars();
-    animateScore();
-    updateStickyBar();
   };
   window.addEventListener("scroll", onScroll, { passive: true });
 
   /* ── NAV SMOOTH SCROLL ───────────────────────── */
-  const hamburger = document.getElementById("hamburger");
-  const navLinksEl = document.getElementById("navLinks");
-
   navLinks.forEach((a) => {
     a.addEventListener("click", (e) => {
       e.preventDefault();
@@ -104,19 +107,40 @@ document.addEventListener("DOMContentLoaded", () => {
           target.scrollIntoView({ behavior: "smooth" });
         }
       }
-      navLinksEl?.classList.remove("open");
-      hamburger?.classList.remove("open");
+      closeNav();
     });
   });
 
+  function closeNav() {
+    hamburger?.classList.remove("open");
+    hamburger?.setAttribute("aria-expanded", "false");
+    navLinksEl?.classList.remove("open");
+    navOverlay?.classList.remove("show");
+    document.body.style.overflow = "";
+  }
+
   hamburger?.addEventListener("click", () => {
-    hamburger.classList.toggle("open");
-    navLinksEl?.classList.toggle("open");
+    const isOpen = navLinksEl?.classList.contains("open");
+    if (isOpen) {
+      closeNav();
+    } else {
+      hamburger.classList.add("open");
+      hamburger.setAttribute("aria-expanded", "true");
+      navLinksEl?.classList.add("open");
+      navOverlay?.classList.add("show");
+      document.body.style.overflow = "hidden";
+    }
   });
+
+  navOverlay?.addEventListener("click", closeNav);
+
   document.addEventListener("click", (e) => {
-    if (navbar && !navbar.contains(e.target)) {
-      hamburger?.classList.remove("open");
-      navLinksEl?.classList.remove("open");
+    if (
+      navbar &&
+      !navbar.contains(e.target) &&
+      navLinksEl?.classList.contains("open")
+    ) {
+      closeNav();
     }
   });
 
@@ -139,62 +163,58 @@ document.addEventListener("DOMContentLoaded", () => {
     );
   }
 
-  /* ── LAZY IMAGES ─────────────────────────────── */
-  const imgObserver = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (!entry.isIntersecting) return;
-        const img = entry.target;
-        const src = img.getAttribute("data-src");
-        if (!src) return;
-        const t = new Image();
-        t.onload = () => {
-          img.src = src;
-          img.classList.add("loaded");
-        };
-        t.src = src;
-        imgObserver.unobserve(img);
-      });
-    },
-    { rootMargin: "100px" },
-  );
-  document
-    .querySelectorAll(".lazy-img")
-    .forEach((img) => imgObserver.observe(img));
-
-  /* ── RATING BARS ─────────────────────────────── */
+  /* ── RATING BARS — IntersectionObserver ─────── */
   let barsAnimated = false;
   const reviewsSection = document.getElementById("reviews");
-  function animateRatingBars() {
-    if (barsAnimated || !reviewsSection) return;
-    if (reviewsSection.getBoundingClientRect().top < window.innerHeight - 100) {
-      barsAnimated = true;
-      document.querySelectorAll(".bar-fill").forEach((bar) => {
-        requestAnimationFrame(() => {
-          bar.style.width = bar.getAttribute("data-width");
-        });
+
+  const reviewsObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting && !barsAnimated) {
+          barsAnimated = true;
+          document.querySelectorAll(".bar-fill").forEach((bar) => {
+            requestAnimationFrame(() => {
+              bar.style.width = bar.getAttribute("data-width");
+            });
+          });
+          animateScore();
+          reviewsObserver.disconnect();
+        }
       });
-    }
-  }
+    },
+    { threshold: 0.2 },
+  );
+  if (reviewsSection) reviewsObserver.observe(reviewsSection);
 
   /* ── SCORE COUNT-UP ──────────────────────────── */
-  let scoreAnimated = false;
   const scoreEl = document.getElementById("scoreCount");
   function animateScore() {
-    if (scoreAnimated || !scoreEl || !reviewsSection) return;
-    if (reviewsSection.getBoundingClientRect().top < window.innerHeight - 100) {
-      scoreAnimated = true;
-      const target = 4.3,
-        duration = 1400,
-        startTime = performance.now();
-      const tick = (now) => {
-        const p = Math.min((now - startTime) / duration, 1);
-        scoreEl.textContent = ((1 - Math.pow(1 - p, 3)) * target).toFixed(1);
-        if (p < 1) requestAnimationFrame(tick);
-      };
-      requestAnimationFrame(tick);
-    }
+    if (!scoreEl) return;
+    const target = 4.3,
+      duration = 1400,
+      startTime = performance.now();
+    const tick = (now) => {
+      const p = Math.min((now - startTime) / duration, 1);
+      scoreEl.textContent = ((1 - Math.pow(1 - p, 3)) * target).toFixed(1);
+      if (p < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
   }
+
+  /* ── BENEFIT CARD NUMBER ANIMATE ────────────── */
+  const benefitNums = document.querySelectorAll(".benefit-num");
+  const benefitObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("num-animated");
+          benefitObserver.unobserve(entry.target);
+        }
+      });
+    },
+    { threshold: 0.5 },
+  );
+  benefitNums.forEach((num) => benefitObserver.observe(num));
 
   /* ── SHARE ───────────────────────────────────── */
   const shareToast = document.getElementById("shareToast");
@@ -237,6 +257,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const wishlistNavIcon = document.getElementById("wishlistNavIcon");
   const wishlistToast = document.getElementById("wishlistToast");
   const wishlistMsg = document.getElementById("wishlistMsg");
+  const wishlistToastIcon = document.querySelector(".wishlist-toast-icon");
 
   let wishlisted = localStorage.getItem("hlc_wishlisted") === "true";
 
@@ -262,6 +283,10 @@ document.addEventListener("DOMContentLoaded", () => {
       wishlistMsg.textContent = wishlisted
         ? "Added to wishlist!"
         : "Removed from wishlist";
+    if (wishlistToastIcon)
+      wishlistToastIcon.style.color = wishlisted
+        ? "var(--wishlist-toast-icon-color)"
+        : "var(--muted)";
     wishlistToast?.classList.add("show");
     setTimeout(() => wishlistToast?.classList.remove("show"), 2500);
   }
@@ -283,24 +308,55 @@ document.addEventListener("DOMContentLoaded", () => {
   const cartEmpty = document.getElementById("cartEmpty");
   const cartFooter = document.getElementById("cartFooter");
   const removeItemBtn = document.getElementById("removeItemBtn");
+  const cartPromoWrap = document.getElementById("cartPromoWrap");
+  const qtyTierNudge = document.getElementById("qtyTierNudge");
+  const qtyTierMsg = document.getElementById("qtyTierMsg");
+  const stickyBuyPrice = document.getElementById("stickyBuyPrice");
 
   const PRICE = 50;
-  let cartQty = 0;
+  const TIERS = [{ minQty: 3, discount: 0.15 }];
+
+  let cartQty = parseInt(localStorage.getItem("hlc_cartQty") || "0");
   let promoApplied = false;
   let promoDiscount = 0;
   let promoCode = "";
 
   const PROMO_CODES = { NATURE10: 0.1, SAVE15: 0.15 };
 
+  /* Restore saved promo */
+  const savedPromo = localStorage.getItem("hlc_promo");
+  if (savedPromo && PROMO_CODES[savedPromo]) {
+    promoApplied = true;
+    promoDiscount = PROMO_CODES[savedPromo];
+    promoCode = savedPromo;
+    const inp = document.getElementById("promoCodeInput");
+    const btn = document.getElementById("promoApplyBtn");
+    const fb = document.getElementById("promoFeedback");
+    if (inp) {
+      inp.value = savedPromo;
+      inp.disabled = true;
+    }
+    if (btn) {
+      btn.textContent = "Applied";
+      btn.disabled = true;
+    }
+    if (fb) {
+      fb.textContent = `✓ ${savedPromo} applied — ${Math.round(promoDiscount * 100)}% off!`;
+      fb.className = "promo-feedback success";
+    }
+  }
+
   const openCart = () => {
     cartDrawer?.classList.add("show");
     cartOverlay?.classList.add("show");
     document.body.style.overflow = "hidden";
+    trapFocus(cartDrawer);
   };
   const closeCart = () => {
     cartDrawer?.classList.remove("show");
     cartOverlay?.classList.remove("show");
     document.body.style.overflow = "";
+    releaseFocus(cartDrawer);
   };
 
   cartToggle?.addEventListener("click", openCart);
@@ -334,21 +390,62 @@ document.addEventListener("DOMContentLoaded", () => {
     updateCart();
   });
 
+  function getTierDiscount(qty) {
+    for (let i = TIERS.length - 1; i >= 0; i--) {
+      if (qty >= TIERS[i].minQty) return TIERS[i].discount;
+    }
+    return 0;
+  }
+
   function updateCart() {
+    localStorage.setItem("hlc_cartQty", cartQty);
+
     const isEmpty = cartQty === 0;
+    const tierDisc = getTierDiscount(cartQty);
+    const effectiveDisc = Math.max(promoApplied ? promoDiscount : 0, tierDisc);
     const subtotal = cartQty * PRICE;
-    const discount = promoApplied ? Math.round(subtotal * promoDiscount) : 0;
+    const discount = Math.round(subtotal * effectiveDisc);
     const total = subtotal - discount;
 
-    if (cartItem) cartItem.style.display = isEmpty ? "none" : "flex";
-    if (cartEmpty) cartEmpty.style.display = isEmpty ? "flex" : "none";
+    /* Show / hide cart item vs empty state */
+    cartItem?.classList.toggle("hidden", isEmpty);
+    cartEmpty?.classList.toggle("hidden", !isEmpty);
+
+    /* Remove button */
+    if (removeItemBtn) removeItemBtn.style.display = isEmpty ? "none" : "flex";
+
+    /* Promo wrap */
+    cartPromoWrap?.classList.toggle("hidden", isEmpty);
+
+    /* Footer */
     if (cartFooter) {
       cartFooter.style.opacity = isEmpty ? "0.45" : "1";
       cartFooter.style.pointerEvents = isEmpty ? "none" : "auto";
     }
-    if (removeItemBtn) removeItemBtn.classList.toggle("visible", cartQty === 1);
+
+    /* Qty tier nudge */
+    if (qtyTierNudge && qtyTierMsg) {
+      if (!isEmpty && cartQty < 3) {
+        const need = 3 - cartQty;
+        qtyTierMsg.textContent = `Add ${need} more unit${need > 1 ? "s" : ""} — get 15% off!`;
+        qtyTierNudge.classList.remove("hidden", "tier-applied");
+      } else if (!isEmpty && cartQty >= 3) {
+        qtyTierMsg.textContent = `15% tier discount applied on ${cartQty} units 🎉`;
+        qtyTierNudge.classList.remove("hidden");
+        qtyTierNudge.classList.add("tier-applied");
+      } else {
+        qtyTierNudge.classList.add("hidden");
+      }
+    }
+
+    /* Qty display */
     if (qtyValueEl) qtyValueEl.textContent = cartQty;
     if (cartBadge) cartBadge.textContent = cartQty;
+
+    /* Item total price in row */
+    const cartItemTotalPrice = document.querySelector(".cart-item-total-price");
+    if (cartItemTotalPrice) cartItemTotalPrice.textContent = subtotal;
+
     if (cartSubtotalEl) cartSubtotalEl.textContent = subtotal;
     if (totalEl) totalEl.textContent = `₹${total}`;
     if (cartHeaderSub)
@@ -356,14 +453,27 @@ document.addEventListener("DOMContentLoaded", () => {
         ? "0 items"
         : `${cartQty} item${cartQty > 1 ? "s" : ""} · ₹${total}`;
 
+    /* Promo row */
     const cartPromoRow = document.getElementById("cartPromoRow");
     const cartPromoSaving = document.getElementById("cartPromoSaving");
     const cartPromoLabel = document.getElementById("cartPromoLabel");
     if (cartPromoRow)
-      cartPromoRow.style.display = promoApplied && !isEmpty ? "flex" : "none";
-    if (cartPromoSaving) cartPromoSaving.textContent = `Save ₹${discount}`;
-    if (cartPromoLabel) cartPromoLabel.textContent = `${promoCode} applied:`;
+      cartPromoRow.classList.toggle("hidden", !(effectiveDisc > 0 && !isEmpty));
+    if (cartPromoSaving) cartPromoSaving.textContent = `−₹${discount}`;
+    if (cartPromoLabel)
+      cartPromoLabel.textContent =
+        promoApplied && promoDiscount >= tierDisc
+          ? promoCode
+          : "Tier (3+ units)";
 
+    /* Sticky bar price */
+    if (stickyBuyPrice) {
+      stickyBuyPrice.textContent = promoApplied
+        ? `₹${PRICE - Math.round(PRICE * promoDiscount)} after ${promoCode} · 10g`
+        : "₹50 · 10g";
+    }
+
+    /* Screen reader announcement */
     const announce = document.getElementById("cartAnnounce");
     if (announce)
       announce.textContent = isEmpty
@@ -389,17 +499,19 @@ document.addEventListener("DOMContentLoaded", () => {
       promoFeedback.className = "promo-feedback error";
       return;
     }
-
     if (PROMO_CODES[entered] !== undefined) {
       promoApplied = true;
       promoDiscount = PROMO_CODES[entered];
       promoCode = entered;
+      localStorage.setItem("hlc_promo", entered);
       promoFeedback.textContent = `✓ ${entered} applied — ${Math.round(promoDiscount * 100)}% off!`;
       promoFeedback.className = "promo-feedback success";
       promoCodeInput.value = entered;
       promoCodeInput.disabled = true;
-      promoApplyBtn.textContent = "Applied";
-      promoApplyBtn.disabled = true;
+      if (promoApplyBtn) {
+        promoApplyBtn.textContent = "Applied";
+        promoApplyBtn.disabled = true;
+      }
     } else {
       promoApplied = false;
       promoDiscount = 0;
@@ -411,15 +523,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /* ── COMPARISON TABLE SCROLL ─────────────────── */
   const comparisonScroll = document.getElementById("comparisonScroll");
-  const tableFadeMask = document.getElementById("tableFadeMask");
   const tableScrollHint = document.getElementById("tableScrollHint");
 
   function updateTableMask() {
-    if (!comparisonScroll || !tableFadeMask) return;
-    const { scrollLeft, scrollWidth, clientWidth } = comparisonScroll;
+    if (!comparisonScroll) return;
+    const { scrollWidth, clientWidth } = comparisonScroll;
     const isOverflowing = scrollWidth > clientWidth + 2;
-    const atEnd = scrollLeft + clientWidth >= scrollWidth - 4;
-    tableFadeMask.style.display = isOverflowing && !atEnd ? "block" : "none";
     if (tableScrollHint)
       tableScrollHint.style.display = isOverflowing ? "flex" : "none";
   }
@@ -431,6 +540,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /* ── FOCUS TRAP ──────────────────────────────── */
   function trapFocus(modal) {
+    if (!modal) return;
     const focusable = modal.querySelectorAll(
       'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])',
     );
@@ -454,13 +564,14 @@ document.addEventListener("DOMContentLoaded", () => {
     modal.addEventListener("keydown", modal._trapHandler);
   }
   function releaseFocus(modal) {
-    if (modal._trapHandler)
+    if (modal?._trapHandler)
       modal.removeEventListener("keydown", modal._trapHandler);
   }
 
   /* ── MODALS ──────────────────────────────────── */
   const orderSuccess = document.getElementById("orderSuccess");
   const contactSuccessModal = document.getElementById("contactSuccess");
+  const reviewSuccessModal = document.getElementById("reviewSuccess");
   const modalReplyEmail = document.getElementById("modalReplyEmail");
 
   document.getElementById("checkoutBtn")?.addEventListener("click", () => {
@@ -476,16 +587,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
   document.getElementById("closeOrderModal")?.addEventListener("click", () => {
     orderSuccess?.classList.remove("show");
-    if (orderSuccess) releaseFocus(orderSuccess);
+    releaseFocus(orderSuccess);
   });
   document
     .getElementById("closeContactModal")
     ?.addEventListener("click", () => {
       contactSuccessModal?.classList.remove("show");
-      if (contactSuccessModal) releaseFocus(contactSuccessModal);
+      releaseFocus(contactSuccessModal);
     });
+  document.getElementById("closeReviewModal")?.addEventListener("click", () => {
+    reviewSuccessModal?.classList.remove("show");
+    releaseFocus(reviewSuccessModal);
+  });
 
-  [orderSuccess, contactSuccessModal].forEach((modal) => {
+  [orderSuccess, contactSuccessModal, reviewSuccessModal].forEach((modal) => {
     modal?.addEventListener("click", (e) => {
       if (e.target === modal) {
         modal.classList.remove("show");
@@ -493,19 +608,25 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   });
+
+  /* Escape closes cart + modals */
   document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") {
-      [orderSuccess, contactSuccessModal].forEach((modal) => {
-        if (modal?.classList.contains("show")) {
-          modal.classList.remove("show");
-          releaseFocus(modal);
-        }
-      });
+    if (e.key !== "Escape") return;
+    if (cartDrawer?.classList.contains("show")) {
+      closeCart();
+      return;
     }
+    [orderSuccess, contactSuccessModal, reviewSuccessModal].forEach((modal) => {
+      if (modal?.classList.contains("show")) {
+        modal.classList.remove("show");
+        releaseFocus(modal);
+      }
+    });
   });
 
   /* ── CONTACT FORM ────────────────────────────── */
   const contactForm = document.getElementById("contactForm");
+  const formSubmitError = document.getElementById("formSubmitError");
 
   function validateField(input) {
     const errorEl = document.getElementById(input.id + "Error");
@@ -539,8 +660,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const btn = contactForm.querySelector("button[type=submit]");
     btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending…';
     btn.disabled = true;
+    if (formSubmitError) {
+      formSubmitError.textContent = "";
+      formSubmitError.className = "form-submit-error";
+    }
 
-    // Show email in modal
     const emailVal = contactForm.querySelector("#email")?.value?.trim();
     if (modalReplyEmail && emailVal) modalReplyEmail.textContent = emailVal;
 
@@ -560,10 +684,18 @@ document.addEventListener("DOMContentLoaded", () => {
           if (contactSuccessModal) releaseFocus(contactSuccessModal);
         }, 5000);
       } else {
-        alert("Something went wrong. Please try again.");
+        if (formSubmitError) {
+          formSubmitError.textContent =
+            "Something went wrong. Please try again.";
+          formSubmitError.className = "form-submit-error visible";
+        }
       }
     } catch {
-      alert("Network error. Please try again later.");
+      if (formSubmitError) {
+        formSubmitError.textContent =
+          "Network error. Please check your connection and try again.";
+        formSubmitError.className = "form-submit-error visible";
+      }
     } finally {
       btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Send Message';
       btn.disabled = false;
@@ -605,11 +737,11 @@ document.addEventListener("DOMContentLoaded", () => {
     showingAll = !showingAll;
     hiddenReviews.forEach((card, i) => {
       if (showingAll) {
-        card.style.display = "flex";
+        card.classList.remove("hidden");
         card.style.animationDelay = `${i * 80}ms`;
         card.style.animation = "reviewFadeIn 0.5s ease forwards";
       } else {
-        card.style.display = "none";
+        card.classList.add("hidden");
         card.style.animation = "";
       }
     });
@@ -618,6 +750,169 @@ document.addEventListener("DOMContentLoaded", () => {
       : '<i class="fa-solid fa-chevron-down"></i> Show More Reviews';
     if (!showingAll)
       reviewsSection?.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+
+  /* ── REVIEW HELPFUL BUTTONS ──────────────────── */
+  document.querySelectorAll(".review-helpful").forEach((btn) => {
+    const id = btn.getAttribute("data-id");
+    const key = `hlc_helpful_${id}`;
+    const countEl = btn.querySelector(".helpful-count");
+    let voted = localStorage.getItem(key) === "1";
+    if (voted) btn.classList.add("voted");
+
+    btn.addEventListener("click", () => {
+      if (voted) return;
+      voted = true;
+      localStorage.setItem(key, "1");
+      btn.classList.add("voted");
+      if (countEl) countEl.textContent = parseInt(countEl.textContent) + 1;
+    });
+  });
+
+  /* ── WRITE A REVIEW ──────────────────────────── */
+  const writeReviewToggle = document.getElementById("writeReviewToggle");
+  const writeReviewCancel = document.getElementById("writeReviewCancel");
+  const writeReviewForm = document.getElementById("writeReviewForm");
+  let selectedRating = 0;
+
+  writeReviewToggle?.addEventListener("click", () => {
+    writeReviewForm?.classList.add("open");
+    writeReviewToggle.style.display = "none";
+    writeReviewForm?.querySelector("input, textarea")?.focus();
+  });
+
+  writeReviewCancel?.addEventListener("click", () => {
+    writeReviewForm?.classList.remove("open");
+    writeReviewToggle.style.display = "";
+    selectedRating = 0;
+    resetStars();
+  });
+
+  /* Star picker */
+  const starBtns = document.querySelectorAll(".star-pick");
+  starBtns.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      selectedRating = parseInt(btn.getAttribute("data-val"));
+      document.getElementById("wr-rating").value = selectedRating;
+      updateStars(selectedRating);
+    });
+    btn.addEventListener("mouseenter", () =>
+      updateStars(parseInt(btn.getAttribute("data-val"))),
+    );
+    btn.addEventListener("mouseleave", () => updateStars(selectedRating));
+  });
+
+  function updateStars(val) {
+    starBtns.forEach((b) => {
+      const bVal = parseInt(b.getAttribute("data-val"));
+      b.querySelector("i").className =
+        bVal <= val ? "fa-solid fa-star" : "fa-regular fa-star";
+    });
+  }
+  function resetStars() {
+    starBtns.forEach((b) => {
+      b.querySelector("i").className = "fa-regular fa-star";
+    });
+    const ratingInput = document.getElementById("wr-rating");
+    if (ratingInput) ratingInput.value = 0;
+  }
+
+  writeReviewForm?.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const name = document.getElementById("wr-name")?.value.trim();
+    const rating = parseInt(document.getElementById("wr-rating")?.value || "0");
+    const text = document.getElementById("wr-text")?.value.trim();
+
+    if (!name || !text || rating === 0) {
+      if (rating === 0) {
+        const picker = document.querySelector(".star-picker");
+        picker?.classList.add("star-error");
+        setTimeout(() => picker?.classList.remove("star-error"), 800);
+      }
+      return;
+    }
+
+    const grid = document.querySelector(".review-grid");
+    const card = document.createElement("div");
+    card.className = "review-card";
+    card.style.animation = "reviewFadeIn 0.5s ease forwards";
+
+    const starsHtml = Array.from(
+      { length: 5 },
+      (_, i) =>
+        `<i class="fa-${i < rating ? "solid" : "regular"} fa-star"></i>`,
+    ).join("");
+    const initial = name.charAt(0).toUpperCase();
+    const palettes = [
+      { bg: "#e9f7f2", col: "#2f8f6d" },
+      { bg: "#f6f0ff", col: "#6b3aa6" },
+      { bg: "#fff6ea", col: "#e07a1f" },
+      { bg: "#e8f8ff", col: "#0b6b8c" },
+    ];
+    const p = palettes[Math.floor(Math.random() * palettes.length)];
+
+    card.innerHTML = `
+      <div class="review-top">
+        <div class="review-avatar" style="--av-bg:${p.bg};--av-color:${p.col}">${initial}</div>
+        <div>
+          <h5>${name}</h5>
+          <div class="review-stars">${starsHtml}</div>
+        </div>
+        <span class="review-date">Just now</span>
+      </div>
+      <p>"${text}"</p>
+      <button class="review-helpful voted" aria-label="Mark as helpful">
+        <i class="fa-solid fa-thumbs-up"></i>
+        <span class="helpful-count">0</span> people found this helpful
+      </button>`;
+    grid.insertBefore(card, grid.firstChild);
+
+    writeReviewForm.reset();
+    selectedRating = 0;
+    resetStars();
+    writeReviewForm.classList.remove("open");
+    writeReviewToggle.style.display = "";
+
+    reviewSuccessModal?.classList.add("show");
+    if (reviewSuccessModal) trapFocus(reviewSuccessModal);
+    setTimeout(() => {
+      reviewSuccessModal?.classList.remove("show");
+      releaseFocus(reviewSuccessModal);
+    }, 4000);
+  });
+
+  /* ── INGREDIENT EXPAND PANELS ────────────────── */
+  document.querySelectorAll(".ingredient-overlay").forEach((overlay) => {
+    const card = overlay.closest(".ingredient-card");
+    const expandEl = card?.querySelector(".ingredient-expand");
+
+    function toggleExpand() {
+      const isOpen = card.classList.contains("expanded");
+      document.querySelectorAll(".ingredient-card.expanded").forEach((c) => {
+        c.classList.remove("expanded");
+        c.querySelector(".ingredient-overlay")?.setAttribute(
+          "aria-expanded",
+          "false",
+        );
+        c.querySelector(".ingredient-expand")?.setAttribute(
+          "aria-hidden",
+          "true",
+        );
+      });
+      if (!isOpen) {
+        card.classList.add("expanded");
+        overlay.setAttribute("aria-expanded", "true");
+        expandEl?.setAttribute("aria-hidden", "false");
+      }
+    }
+
+    overlay.addEventListener("click", toggleExpand);
+    overlay.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        toggleExpand();
+      }
+    });
   });
 
   /* ── FAQ ─────────────────────────────────────── */
@@ -636,6 +931,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  /* Initial render */
+  /* ── INITIAL RENDER ──────────────────────────── */
   updateCart();
+  updateScrollProgress();
 }); // END DOMContentLoaded
