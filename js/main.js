@@ -3,14 +3,10 @@ window.addEventListener("load", () => {
   const minDisplay = 1500;
   const loadStart = performance.now();
   const reveal = () => {
-    const elapsed = performance.now() - loadStart;
-    const wait = Math.max(0, minDisplay - elapsed);
+    const wait = Math.max(0, minDisplay - (performance.now() - loadStart));
     setTimeout(() => {
       document.body.classList.remove("loading");
-      setTimeout(() => {
-        const loader = document.getElementById("pageLoader");
-        if (loader) loader.remove();
-      }, 800);
+      setTimeout(() => document.getElementById("pageLoader")?.remove(), 800);
     }, wait);
   };
   reveal();
@@ -33,14 +29,13 @@ document.addEventListener("DOMContentLoaded", () => {
   const themeIcon = document.getElementById("themeIcon");
   const html = document.documentElement;
 
-  const savedTheme = localStorage.getItem("hlc_theme") || "light";
-  html.setAttribute("data-theme", savedTheme);
-  updateThemeIcon(savedTheme);
+  html.setAttribute("data-theme", localStorage.getItem("hlc_theme") || "light");
+  updateThemeIcon(html.getAttribute("data-theme"));
 
   function updateThemeIcon(theme) {
-    if (!themeIcon) return;
-    themeIcon.className =
-      theme === "dark" ? "fa-solid fa-sun" : "fa-solid fa-moon";
+    if (themeIcon)
+      themeIcon.className =
+        theme === "dark" ? "fa-solid fa-sun" : "fa-solid fa-moon";
   }
 
   themeToggle?.addEventListener("click", () => {
@@ -50,7 +45,7 @@ document.addEventListener("DOMContentLoaded", () => {
     updateThemeIcon(next);
   });
 
-  /* ── SCROLL PROGRESS BAR ─────────────────────── */
+  /* ── SCROLL PROGRESS ─────────────────────────── */
   const scrollProgress = document.getElementById("scrollProgress");
   function updateScrollProgress() {
     if (!scrollProgress) return;
@@ -75,24 +70,26 @@ document.addEventListener("DOMContentLoaded", () => {
   const navLinksEl = document.getElementById("navLinks");
   const navOverlay = document.getElementById("navOverlay");
 
-  const onScroll = () => {
-    const sy = window.scrollY;
-    navbar?.classList.toggle("scrolled", sy > 20);
-    backToTop?.classList.toggle("show", sy > 400);
-    updateScrollProgress();
-    updateStickyBar();
-    let current = "";
-    sections.forEach((s) => {
-      if (sy >= s.offsetTop - 120 && sy < s.offsetTop - 120 + s.offsetHeight)
-        current = s.id;
-    });
-    navLinks.forEach((a) =>
-      a.classList.toggle("active", a.getAttribute("href") === "#" + current),
-    );
-  };
-  window.addEventListener("scroll", onScroll, { passive: true });
+  window.addEventListener(
+    "scroll",
+    () => {
+      const sy = window.scrollY;
+      navbar?.classList.toggle("scrolled", sy > 20);
+      backToTop?.classList.toggle("show", sy > 400);
+      updateScrollProgress();
+      updateStickyBar();
+      let current = "";
+      sections.forEach((s) => {
+        if (sy >= s.offsetTop - 120 && sy < s.offsetTop - 120 + s.offsetHeight)
+          current = s.id;
+      });
+      navLinks.forEach((a) =>
+        a.classList.toggle("active", a.getAttribute("href") === "#" + current),
+      );
+    },
+    { passive: true },
+  );
 
-  /* ── NAV SMOOTH SCROLL ───────────────────────── */
   navLinks.forEach((a) => {
     a.addEventListener("click", (e) => {
       e.preventDefault();
@@ -132,21 +129,18 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   navOverlay?.addEventListener("click", closeNav);
-
   document.addEventListener("click", (e) => {
     if (
       navbar &&
       !navbar.contains(e.target) &&
       navLinksEl?.classList.contains("open")
-    ) {
+    )
       closeNav();
-    }
   });
 
   document.querySelector(".learn-more-btn")?.addEventListener("click", () => {
     document.getElementById("about")?.scrollIntoView({ behavior: "smooth" });
   });
-
   backToTop?.addEventListener("click", () =>
     window.scrollTo({ top: 0, behavior: "smooth" }),
   );
@@ -155,17 +149,16 @@ document.addEventListener("DOMContentLoaded", () => {
   const stickyBuyBar = document.getElementById("stickyBuyBar");
   const heroSection = document.getElementById("home");
   function updateStickyBar() {
-    if (!stickyBuyBar || !heroSection) return;
-    stickyBuyBar.classList.toggle(
-      "show",
-      heroSection.getBoundingClientRect().bottom < 0,
-    );
+    if (stickyBuyBar && heroSection)
+      stickyBuyBar.classList.toggle(
+        "show",
+        heroSection.getBoundingClientRect().bottom < 0,
+      );
   }
 
-  /* ── RATING BARS — IntersectionObserver ─────── */
+  /* ── RATING BARS ─────────────────────────────── */
   let barsAnimated = false;
   const reviewsSection = document.getElementById("reviews");
-
   const reviewsObserver = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
@@ -201,7 +194,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* ── BENEFIT CARD NUMBER ANIMATE ────────────── */
-  const benefitNums = document.querySelectorAll(".benefit-num");
   const benefitObserver = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
@@ -213,7 +205,9 @@ document.addEventListener("DOMContentLoaded", () => {
     },
     { threshold: 0.5 },
   );
-  benefitNums.forEach((num) => benefitObserver.observe(num));
+  document
+    .querySelectorAll(".benefit-num")
+    .forEach((num) => benefitObserver.observe(num));
 
   /* ── SHARE ───────────────────────────────────── */
   const shareToast = document.getElementById("shareToast");
@@ -314,15 +308,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const PRICE = 50;
   const TIERS = [{ minQty: 3, discount: 0.15 }];
-
   let cartQty = parseInt(localStorage.getItem("hlc_cartQty") || "0");
   let promoApplied = false;
   let promoDiscount = 0;
   let promoCode = "";
-
   const PROMO_CODES = { NATURE10: 0.1, SAVE15: 0.15 };
 
-  /* Restore saved promo */
+  /* Restore saved promo on load */
   const savedPromo = localStorage.getItem("hlc_promo");
   if (savedPromo && PROMO_CODES[savedPromo]) {
     promoApplied = true;
@@ -420,7 +412,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function updateCart() {
     localStorage.setItem("hlc_cartQty", cartQty);
-
     const isEmpty = cartQty === 0;
     const tierDisc = getTierDiscount(cartQty);
     const effectiveDisc = Math.max(promoApplied ? promoDiscount : 0, tierDisc);
@@ -432,11 +423,7 @@ document.addEventListener("DOMContentLoaded", () => {
     cartEmpty?.classList.toggle("hidden", !isEmpty);
     if (removeItemBtn) removeItemBtn.style.display = isEmpty ? "none" : "flex";
     cartPromoWrap?.classList.toggle("hidden", isEmpty);
-
-    if (cartFooter) {
-      cartFooter.style.opacity = isEmpty ? "0.45" : "1";
-      cartFooter.style.pointerEvents = isEmpty ? "none" : "auto";
-    }
+    cartFooter?.classList.toggle("cart-footer--disabled", isEmpty);
 
     if (qtyTierNudge && qtyTierMsg) {
       if (!isEmpty && cartQty < 3) {
@@ -468,8 +455,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const cartPromoRow = document.getElementById("cartPromoRow");
     const cartPromoSaving = document.getElementById("cartPromoSaving");
     const cartPromoLabel = document.getElementById("cartPromoLabel");
-    if (cartPromoRow)
-      cartPromoRow.classList.toggle("hidden", !(effectiveDisc > 0 && !isEmpty));
+    cartPromoRow?.classList.toggle("hidden", !(effectiveDisc > 0 && !isEmpty));
     if (cartPromoSaving) cartPromoSaving.textContent = `−₹${discount}`;
     if (cartPromoLabel)
       cartPromoLabel.textContent =
@@ -477,11 +463,10 @@ document.addEventListener("DOMContentLoaded", () => {
           ? promoCode
           : "Tier (3+ units)";
 
-    if (stickyBuyPrice) {
+    if (stickyBuyPrice)
       stickyBuyPrice.textContent = promoApplied
         ? `₹${PRICE - Math.round(PRICE * promoDiscount)} after ${promoCode} · 10g`
         : "₹50 · 10g";
-    }
 
     const announce = document.getElementById("cartAnnounce");
     if (announce)
@@ -533,11 +518,10 @@ document.addEventListener("DOMContentLoaded", () => {
   /* ── COMPARISON TABLE SCROLL ─────────────────── */
   const comparisonScroll = document.getElementById("comparisonScroll");
   const tableScrollHint = document.getElementById("tableScrollHint");
-
   function updateTableMask() {
     if (!comparisonScroll) return;
-    const { scrollWidth, clientWidth } = comparisonScroll;
-    const isOverflowing = scrollWidth > clientWidth + 2;
+    const isOverflowing =
+      comparisonScroll.scrollWidth > comparisonScroll.clientWidth + 2;
     if (tableScrollHint)
       tableScrollHint.style.display = isOverflowing ? "flex" : "none";
   }
@@ -814,9 +798,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function updateStars(val) {
     starBtns.forEach((b) => {
-      const bVal = parseInt(b.getAttribute("data-val"));
       b.querySelector("i").className =
-        bVal <= val ? "fa-solid fa-star" : "fa-regular fa-star";
+        parseInt(b.getAttribute("data-val")) <= val
+          ? "fa-solid fa-star"
+          : "fa-regular fa-star";
     });
   }
   function resetStars() {
@@ -852,7 +837,6 @@ document.addEventListener("DOMContentLoaded", () => {
       (_, i) =>
         `<i class="fa-${i < rating ? "solid" : "regular"} fa-star"></i>`,
     ).join("");
-    const initial = name.charAt(0).toUpperCase();
     const palettes = [
       { bg: "#e9f7f2", col: "#2f8f6d" },
       { bg: "#f6f0ff", col: "#6b3aa6" },
@@ -863,7 +847,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     card.innerHTML = `
       <div class="review-top">
-        <div class="review-avatar" style="--av-bg:${p.bg};--av-color:${p.col}">${initial}</div>
+        <div class="review-avatar" style="--av-bg:${p.bg};--av-color:${p.col}">${name.charAt(0).toUpperCase()}</div>
         <div><h5>${name}</h5><div class="review-stars">${starsHtml}</div></div>
         <span class="review-date">Just now</span>
       </div>
@@ -895,7 +879,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function toggleExpand() {
       const isOpen = card.classList.contains("expanded");
-      /* Close all others first */
       document.querySelectorAll(".ingredient-card.expanded").forEach((c) => {
         c.classList.remove("expanded");
         c.querySelector(".ingredient-overlay")?.setAttribute(
@@ -943,4 +926,3 @@ document.addEventListener("DOMContentLoaded", () => {
   updateCart();
   updateScrollProgress();
 }); // END DOMContentLoaded
-  

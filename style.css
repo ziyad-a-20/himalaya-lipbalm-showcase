@@ -208,6 +208,22 @@ em {
   margin: 0 auto;
 }
 
+/* Benefits section — moved from inline styles */
+.benefits-section-label {
+  background: rgba(42, 140, 110, 0.2) !important;
+  color: #b8e8d4 !important;
+  border-color: rgba(42, 140, 110, 0.3) !important;
+}
+.benefits-section-title {
+  color: #ffffff !important;
+}
+.benefits-section-sub {
+  color: rgba(255, 255, 255, 0.45) !important;
+}
+.benefits-em {
+  color: #3aad87 !important;
+}
+
 /* ── BUTTONS ───────────────────────────────────── */
 .btn {
   display: inline-flex;
@@ -284,7 +300,6 @@ input.valid,
 textarea.valid {
   border-color: var(--green);
 }
-
 .form-submit-error {
   display: none;
   padding: 12px 16px;
@@ -1419,7 +1434,7 @@ body:not(.loading) .page-loader {
   color: rgba(255, 255, 255, 1);
 }
 
-/* ── INGREDIENTS — FIXED: grid align-items start prevents sibling expansion ── */
+/* ── INGREDIENTS ────────────────────────────────── */
 .ingredients {
   padding: 100px 28px;
   background: var(--white);
@@ -1432,13 +1447,13 @@ body:not(.loading) .page-loader {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 22px;
-  align-items: start; /* KEY FIX: cards don't stretch to fill row height */
+  align-items: start;
 }
 .ingredient-card {
   background: var(--card-bg);
   border-radius: var(--radius);
   border: 1px solid var(--border);
-  overflow: visible; /* KEY FIX: allow expand panel to grow outside without clipping */
+  overflow: visible;
   transition:
     transform var(--t),
     box-shadow var(--t);
@@ -1449,7 +1464,6 @@ body:not(.loading) .page-loader {
   transform: translateY(-8px);
   box-shadow: var(--shadow-lg);
 }
-/* clip the image but not the whole card */
 .ingredient-img-wrap {
   position: relative;
   overflow: hidden;
@@ -2409,7 +2423,7 @@ textarea:focus {
 }
 
 /* ═══════════════════════════════════════════════════
-   CART DRAWER — REDESIGNED (horizontal item layout)
+   CART DRAWER
 ═══════════════════════════════════════════════════ */
 .cart-overlay {
   position: fixed;
@@ -2460,7 +2474,6 @@ textarea:focus {
   overflow: hidden;
 }
 
-/* Header */
 .cart-header {
   padding: 18px 20px;
   display: flex;
@@ -2519,7 +2532,6 @@ textarea:focus {
   color: white;
 }
 
-/* Added toast */
 .cart-added-toast {
   margin: 10px 16px 0;
   padding: 10px 14px;
@@ -2546,7 +2558,6 @@ textarea:focus {
   font-size: 15px;
 }
 
-/* Body */
 .cart-body {
   flex: 1;
   overflow-y: auto;
@@ -2566,7 +2577,7 @@ textarea:focus {
   border-radius: 4px;
 }
 
-/* ── CART ITEM — horizontal layout so qty always visible at 100% zoom ── */
+/* Cart item — horizontal layout */
 .cart-item {
   background: var(--card-bg);
   border: 1px solid var(--border);
@@ -2574,14 +2585,12 @@ textarea:focus {
   overflow: hidden;
   box-shadow: var(--shadow-sm);
   display: flex;
-  flex-direction: row; /* CHANGED: horizontal */
+  flex-direction: row;
   min-height: 120px;
 }
 .cart-item.hidden {
   display: none;
 }
-
-/* Image column — left side, fixed width */
 .cart-item-img-wrap {
   width: 110px;
   flex-shrink: 0;
@@ -2615,8 +2624,6 @@ textarea:focus {
   position: relative;
   z-index: 1;
 }
-
-/* Details column — right side, fills remaining space */
 .cart-item-details {
   flex: 1;
   padding: 14px 14px 12px;
@@ -2624,9 +2631,8 @@ textarea:focus {
   flex-direction: column;
   justify-content: space-between;
   gap: 8px;
-  min-width: 0; /* prevent text overflow */
+  min-width: 0;
 }
-
 .cart-item-header {
   display: flex;
   align-items: flex-start;
@@ -2651,7 +2657,6 @@ textarea:focus {
   color: var(--muted);
   display: block;
 }
-
 .remove-item-btn {
   width: 26px;
   height: 26px;
@@ -2672,8 +2677,6 @@ textarea:focus {
   border-color: #e05a5a;
   color: #e05a5a;
 }
-
-/* Footer row: price left, qty controls right — always on one line */
 .cart-item-footer {
   display: flex;
   align-items: center;
@@ -2689,8 +2692,6 @@ textarea:focus {
   line-height: 1;
   flex-shrink: 0;
 }
-
-/* Qty controls — fixed size, never collapses */
 .qty-controls {
   display: flex;
   align-items: center;
@@ -2736,7 +2737,6 @@ textarea:focus {
   flex-shrink: 0;
 }
 
-/* Qty Tier Nudge */
 .qty-tier-nudge {
   display: flex;
   align-items: center;
@@ -2763,7 +2763,6 @@ textarea:focus {
   flex-shrink: 0;
 }
 
-/* Empty Cart */
 .cart-empty {
   display: flex;
   flex-direction: column;
@@ -2804,7 +2803,6 @@ textarea:focus {
   margin-top: 12px !important;
 }
 
-/* Promo */
 .cart-promo-input-wrap.hidden {
   display: none;
 }
@@ -2872,7 +2870,6 @@ textarea:focus {
   color: #e05a5a;
 }
 
-/* Perks */
 .cart-perks {
   display: flex;
   flex-direction: column;
@@ -2907,6 +2904,11 @@ textarea:focus {
   flex-direction: column;
   gap: 12px;
   flex-shrink: 0;
+  transition: opacity 0.3s ease;
+}
+.cart-footer--disabled {
+  opacity: 0.45;
+  pointer-events: none;
 }
 .cart-summary-block {
   background: var(--bg);
@@ -3384,7 +3386,6 @@ tr[data-aos] {
   }
 }
 
-/* ── RESPONSIVE — MOBILE ────────────────────────── */
 @media (max-width: 768px) {
   .nav-links {
     position: fixed;
@@ -3558,7 +3559,6 @@ tr[data-aos] {
   .wr-row {
     grid-template-columns: 1fr;
   }
-  /* Cart mobile tweaks */
   .cart-item-img-wrap {
     width: 90px;
   }
