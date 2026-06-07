@@ -14,15 +14,13 @@ window.addEventListener("load", () => {
 
 document.addEventListener("DOMContentLoaded", () => {
   /* ── AOS ─────────────────────────────────────── */
-  if (typeof AOS !== "undefined") {
-    AOS.init({
-      duration: 850,
-      easing: "ease-out-cubic",
-      once: true,
-      offset: 30,
-      anchorPlacement: "top-bottom",
-    });
-  }
+  AOS.init({
+    duration: 850,
+    easing: "ease-out-cubic",
+    once: true,
+    offset: 30,
+    anchorPlacement: "top-bottom",
+  });
 
   /* ── DARK MODE ───────────────────────────────── */
   const themeToggle = document.getElementById("themeToggle");
@@ -410,11 +408,31 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  /* ── FIX 1: Discount clarity — promo and tier are
+     now additive up to a cap, and the UI always tells
+     the user exactly which savings are applied.       */
+  function getEffectiveDiscount(qty) {
+    const tierDisc = getTierDiscount(qty);
+    if (promoApplied && tierDisc > 0) {
+      /* Both active: apply promo on top of tier, capped at 25% */
+      return Math.min(tierDisc + promoDiscount, 0.25);
+    }
+    if (promoApplied) return promoDiscount;
+    return tierDisc;
+  }
+
+  function getDiscountLabel(qty) {
+    const tierDisc = getTierDiscount(qty);
+    if (promoApplied && tierDisc > 0) return `${promoCode} + Tier`;
+    if (promoApplied) return promoCode;
+    return "Tier (3+ units)";
+  }
+
   function updateCart() {
     localStorage.setItem("hlc_cartQty", cartQty);
     const isEmpty = cartQty === 0;
+    const effectiveDisc = getEffectiveDiscount(cartQty);
     const tierDisc = getTierDiscount(cartQty);
-    const effectiveDisc = Math.max(promoApplied ? promoDiscount : 0, tierDisc);
     const subtotal = cartQty * PRICE;
     const discount = Math.round(subtotal * effectiveDisc);
     const total = subtotal - discount;
@@ -425,13 +443,17 @@ document.addEventListener("DOMContentLoaded", () => {
     cartPromoWrap?.classList.toggle("hidden", isEmpty);
     cartFooter?.classList.toggle("cart-footer--disabled", isEmpty);
 
+    /* Tier nudge */
     if (qtyTierNudge && qtyTierMsg) {
       if (!isEmpty && cartQty < 3) {
         const need = 3 - cartQty;
         qtyTierMsg.textContent = `Add ${need} more unit${need > 1 ? "s" : ""} — get 15% off!`;
         qtyTierNudge.classList.remove("hidden", "tier-applied");
       } else if (!isEmpty && cartQty >= 3) {
-        qtyTierMsg.textContent = `15% tier discount applied on ${cartQty} units 🎉`;
+        const promoAlso = promoApplied
+          ? ` + ${Math.round(promoDiscount * 100)}% ${promoCode}`
+          : "";
+        qtyTierMsg.textContent = `15% tier${promoAlso} applied on ${cartQty} units 🎉`;
         qtyTierNudge.classList.remove("hidden");
         qtyTierNudge.classList.add("tier-applied");
       } else {
@@ -455,18 +477,21 @@ document.addEventListener("DOMContentLoaded", () => {
     const cartPromoRow = document.getElementById("cartPromoRow");
     const cartPromoSaving = document.getElementById("cartPromoSaving");
     const cartPromoLabel = document.getElementById("cartPromoLabel");
-    cartPromoRow?.classList.toggle("hidden", !(effectiveDisc > 0 && !isEmpty));
+    const hasDiscount = effectiveDisc > 0 && !isEmpty;
+    cartPromoRow?.classList.toggle("hidden", !hasDiscount);
     if (cartPromoSaving) cartPromoSaving.textContent = `−₹${discount}`;
-    if (cartPromoLabel)
-      cartPromoLabel.textContent =
-        promoApplied && promoDiscount >= tierDisc
-          ? promoCode
-          : "Tier (3+ units)";
+    if (cartPromoLabel) cartPromoLabel.textContent = getDiscountLabel(cartQty);
 
-    if (stickyBuyPrice)
-      stickyBuyPrice.textContent = promoApplied
-        ? `₹${PRICE - Math.round(PRICE * promoDiscount)} after ${promoCode} · 10g`
-        : "₹50 · 10g";
+    /* Sticky price: show final per-unit price when any discount applies */
+    if (stickyBuyPrice) {
+      if (effectiveDisc > 0) {
+        const discountedUnit = Math.round(PRICE * (1 - effectiveDisc));
+        const label = getDiscountLabel(cartQty);
+        stickyBuyPrice.textContent = `₹${discountedUnit} after ${label} · 10g`;
+      } else {
+        stickyBuyPrice.textContent = "₹50 · 10g";
+      }
+    }
 
     const announce = document.getElementById("cartAnnounce");
     if (announce)
@@ -498,7 +523,12 @@ document.addEventListener("DOMContentLoaded", () => {
       promoDiscount = PROMO_CODES[entered];
       promoCode = entered;
       localStorage.setItem("hlc_promo", entered);
-      promoFeedback.textContent = `✓ ${entered} applied — ${Math.round(promoDiscount * 100)}% off!`;
+      const tierDisc = getTierDiscount(cartQty);
+      let msg = `✓ ${entered} applied — ${Math.round(promoDiscount * 100)}% off!`;
+      if (tierDisc > 0) {
+        msg += ` Combined with 15% tier discount.`;
+      }
+      promoFeedback.textContent = msg;
       promoFeedback.className = "promo-feedback success";
       promoCodeInput.value = entered;
       promoCodeInput.disabled = true;
@@ -624,7 +654,13 @@ document.addEventListener("DOMContentLoaded", () => {
   const contactForm = document.getElementById("contactForm");
   const formSubmitError = document.getElementById("formSubmitError");
 
-  function validateField(input) {
+  /* ── FIX 2: Only validate fields the user has
+     touched (blurred at least once). On submit we
+     force-validate everything.                       */
+  const touchedFields = new Set();
+
+  function validateField(input, force = false) {
+    if (!force && !touchedFields.has(input)) return true;
     const errorEl = document.getElementById(input.id + "Error");
     let message = "";
     if (!input.value.trim()) {
@@ -642,7 +678,10 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   contactForm?.querySelectorAll("input, textarea").forEach((field) => {
-    field.addEventListener("blur", () => validateField(field));
+    field.addEventListener("blur", () => {
+      touchedFields.add(field);
+      validateField(field);
+    });
     field.addEventListener("input", () => {
       if (field.classList.contains("invalid")) validateField(field);
     });
@@ -651,7 +690,8 @@ document.addEventListener("DOMContentLoaded", () => {
   contactForm?.addEventListener("submit", async (e) => {
     e.preventDefault();
     const fields = [...contactForm.querySelectorAll("input, textarea")];
-    if (!fields.map(validateField).every(Boolean)) return;
+    /* Force-validate all on submit regardless of touched state */
+    if (!fields.map((f) => validateField(f, true)).every(Boolean)) return;
 
     const btn = contactForm.querySelector("button[type=submit]");
     btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending…';
@@ -674,6 +714,7 @@ document.addEventListener("DOMContentLoaded", () => {
         contactSuccessModal?.classList.add("show");
         if (contactSuccessModal) trapFocus(contactSuccessModal);
         contactForm.reset();
+        touchedFields.clear();
         fields.forEach((f) => f.classList.remove("valid", "invalid"));
         setTimeout(() => {
           contactSuccessModal?.classList.remove("show");
@@ -873,6 +914,9 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   /* ── INGREDIENT EXPAND PANELS ────────────────── */
+  /* ── FIX 3: Added Escape key handler to close
+     open ingredient panel, consistent with FAQ
+     and modal Escape behaviour.                      */
   document.querySelectorAll(".ingredient-overlay").forEach((overlay) => {
     const card = overlay.closest(".ingredient-card");
     const expandEl = card?.querySelector(".ingredient-expand");
@@ -904,6 +948,21 @@ document.addEventListener("DOMContentLoaded", () => {
         toggleExpand();
       }
     });
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      const expandedCard = document.querySelector(".ingredient-card.expanded");
+      if (expandedCard) {
+        expandedCard.classList.remove("expanded");
+        expandedCard
+          .querySelector(".ingredient-overlay")
+          ?.setAttribute("aria-expanded", "false");
+        expandedCard
+          .querySelector(".ingredient-expand")
+          ?.setAttribute("aria-hidden", "true");
+      }
+    }
   });
 
   /* ── FAQ ─────────────────────────────────────── */
