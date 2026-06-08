@@ -13,9 +13,14 @@ window.addEventListener("load", () => {
 });
 
 document.addEventListener("DOMContentLoaded", () => {
+  /* ── REDUCED MOTION CHECK ────────────────────── */
+  const prefersReducedMotion = window.matchMedia(
+    "(prefers-reduced-motion: reduce)",
+  ).matches;
+
   /* ── AOS ─────────────────────────────────────── */
   AOS.init({
-    duration: 850,
+    duration: prefersReducedMotion ? 0 : 850,
     easing: "ease-out-cubic",
     once: true,
     offset: 30,
@@ -26,16 +31,13 @@ document.addEventListener("DOMContentLoaded", () => {
   const themeToggle = document.getElementById("themeToggle");
   const themeIcon = document.getElementById("themeIcon");
   const html = document.documentElement;
-
   html.setAttribute("data-theme", localStorage.getItem("hlc_theme") || "light");
   updateThemeIcon(html.getAttribute("data-theme"));
-
   function updateThemeIcon(theme) {
     if (themeIcon)
       themeIcon.className =
         theme === "dark" ? "fa-solid fa-sun" : "fa-solid fa-moon";
   }
-
   themeToggle?.addEventListener("click", () => {
     const next = html.getAttribute("data-theme") === "dark" ? "light" : "dark";
     html.setAttribute("data-theme", next);
@@ -76,6 +78,11 @@ document.addEventListener("DOMContentLoaded", () => {
       backToTop?.classList.toggle("show", sy > 400);
       updateScrollProgress();
       updateStickyBar();
+      if (!prefersReducedMotion) {
+        updateHeroParallax(sy);
+        updateAboutScale(sy);
+        updateBenefitsSpotlight(sy);
+      }
       let current = "";
       sections.forEach((s) => {
         if (sy >= s.offsetTop - 120 && sy < s.offsetTop - 120 + s.offsetHeight)
@@ -112,7 +119,6 @@ document.addEventListener("DOMContentLoaded", () => {
     navOverlay?.classList.remove("show");
     document.body.style.overflow = "";
   }
-
   hamburger?.addEventListener("click", () => {
     const isOpen = navLinksEl?.classList.contains("open");
     if (isOpen) {
@@ -125,7 +131,6 @@ document.addEventListener("DOMContentLoaded", () => {
       document.body.style.overflow = "hidden";
     }
   });
-
   navOverlay?.addEventListener("click", closeNav);
   document.addEventListener("click", (e) => {
     if (
@@ -135,7 +140,6 @@ document.addEventListener("DOMContentLoaded", () => {
     )
       closeNav();
   });
-
   document.querySelector(".learn-more-btn")?.addEventListener("click", () => {
     document.getElementById("about")?.scrollIntoView({ behavior: "smooth" });
   });
@@ -153,6 +157,82 @@ document.addEventListener("DOMContentLoaded", () => {
         heroSection.getBoundingClientRect().bottom < 0,
       );
   }
+
+  /* ── HERO PARALLAX ───────────────────────────── */
+  const heroProductCard = document.getElementById("heroProductCard");
+  function updateHeroParallax(sy) {
+    if (!heroProductCard) return;
+    const heroEl = document.getElementById("home");
+    if (!heroEl) return;
+    const heroBottom = heroEl.offsetTop + heroEl.offsetHeight;
+    if (sy > heroBottom) return;
+    /* card drifts upward at 0.35x scroll speed, creating depth */
+    const offset = sy * 0.35;
+    heroProductCard.style.transform = `translateY(-${offset}px)`;
+  }
+
+  /* ── ABOUT SECTION SCROLL-TRIGGERED SCALE ────── */
+  const aboutImgFrame = document.getElementById("aboutImgFrame");
+  function updateAboutScale(sy) {
+    if (!aboutImgFrame) return;
+    const rect = aboutImgFrame.getBoundingClientRect();
+    const winH = window.innerHeight;
+    /* progress: 0 when bottom of frame enters viewport, 1 when centre reaches viewport centre */
+    const progress = Math.min(Math.max((winH - rect.top) / (winH * 0.7), 0), 1);
+    const scale = 0.95 + 0.05 * progress;
+    aboutImgFrame.style.setProperty("--about-scale", scale);
+  }
+
+  /* ── BENEFITS SPOTLIGHT ──────────────────────── */
+  const benefitsSection = document.getElementById("benefits");
+  const benefitsSpotlight = document.getElementById("benefitsSpotlight");
+  function updateBenefitsSpotlight(sy) {
+    if (!benefitsSection || !benefitsSpotlight) return;
+    const rect = benefitsSection.getBoundingClientRect();
+    const winH = window.innerHeight;
+    const inView = rect.top < winH && rect.bottom > 0;
+    benefitsSpotlight.classList.toggle("active", inView);
+    if (!inView) return;
+    /* spotlight Y tracks viewport centre relative to section */
+    const sectionProgress = Math.min(
+      Math.max(-rect.top / (rect.height - winH), 0),
+      1,
+    );
+    const spotY = 20 + sectionProgress * 60; /* 20% → 80% */
+    benefitsSpotlight.style.setProperty("--spot-x", "50%");
+    benefitsSpotlight.style.setProperty("--spot-y", `${spotY}%`);
+  }
+
+  /* ── LAZY IMAGE OBSERVER ─────────────────────── */
+  const lazyImgObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        const img = entry.target;
+        /* If src already set (non-lazy hero img) just mark loaded */
+        if (img.complete) {
+          img.classList.add("loaded");
+        } else {
+          img.addEventListener("load", () => img.classList.add("loaded"), {
+            once: true,
+          });
+          img.addEventListener("error", () => img.classList.add("loaded"), {
+            once: true,
+          });
+        }
+        lazyImgObserver.unobserve(img);
+      });
+    },
+    { rootMargin: "0px 0px 200px 0px" },
+  );
+
+  document.querySelectorAll("img.lazy-img").forEach((img) => {
+    if (img.complete) {
+      img.classList.add("loaded");
+    } else {
+      lazyImgObserver.observe(img);
+    }
+  });
 
   /* ── RATING BARS ─────────────────────────────── */
   let barsAnimated = false;
@@ -180,6 +260,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const scoreEl = document.getElementById("scoreCount");
   function animateScore() {
     if (!scoreEl) return;
+    if (prefersReducedMotion) {
+      scoreEl.textContent = "4.3";
+      return;
+    }
     const target = 4.3,
       duration = 1400,
       startTime = performance.now();
@@ -191,7 +275,7 @@ document.addEventListener("DOMContentLoaded", () => {
     requestAnimationFrame(tick);
   }
 
-  /* ── BENEFIT CARD NUMBER ANIMATE ────────────── */
+  /* ── BENEFIT NUMBER ANIMATE ──────────────────── */
   const benefitObserver = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
@@ -210,7 +294,6 @@ document.addEventListener("DOMContentLoaded", () => {
   /* ── SHARE ───────────────────────────────────── */
   const shareToast = document.getElementById("shareToast");
   const shareMsg = document.getElementById("shareMsg");
-
   async function handleShare() {
     if (navigator.share) {
       try {
@@ -233,7 +316,6 @@ document.addEventListener("DOMContentLoaded", () => {
     shareToast?.classList.add("show");
     setTimeout(() => shareToast?.classList.remove("show"), 2500);
   }
-
   document
     .getElementById("shareNavBtn")
     ?.addEventListener("click", handleShare);
@@ -249,9 +331,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const wishlistToast = document.getElementById("wishlistToast");
   const wishlistMsg = document.getElementById("wishlistMsg");
   const wishlistToastIcon = document.querySelector(".wishlist-toast-icon");
-
   let wishlisted = localStorage.getItem("hlc_wishlisted") === "true";
-
   function applyWishlistUI() {
     wishlistBtnIcon?.classList.toggle("fa-regular", !wishlisted);
     wishlistBtnIcon?.classList.toggle("fa-solid", wishlisted);
@@ -261,7 +341,6 @@ document.addEventListener("DOMContentLoaded", () => {
     wishlistNavBtn?.classList.toggle("active", wishlisted);
   }
   applyWishlistUI();
-
   function toggleWishlist() {
     wishlisted = !wishlisted;
     localStorage.setItem("hlc_wishlisted", wishlisted);
@@ -284,7 +363,7 @@ document.addEventListener("DOMContentLoaded", () => {
   wishlistBtn?.addEventListener("click", toggleWishlist);
   wishlistNavBtn?.addEventListener("click", toggleWishlist);
 
-  /* ── CART ────────────────────────────────────── */
+  /* ── CART — SPRING PHYSICS ───────────────────── */
   const cartDrawer = document.getElementById("cartDrawer");
   const cartOverlay = document.getElementById("cartOverlay");
   const cartToggle = document.getElementById("cartToggle");
@@ -304,6 +383,85 @@ document.addEventListener("DOMContentLoaded", () => {
   const qtyTierMsg = document.getElementById("qtyTierMsg");
   const stickyBuyPrice = document.getElementById("stickyBuyPrice");
 
+  /* Spring state */
+  let springPos = 100; /* 0 = open, 100 = closed (percent) */
+  let springVel = 0;
+  let springTarget = 100;
+  let springRaf = null;
+  const isMobile = () => window.innerWidth <= 768;
+
+  /* Spring constants — feel: snappy open, bouncy settle */
+  const SPRING_STIFFNESS = 300;
+  const SPRING_DAMPING = 28;
+  const SPRING_MASS = 1;
+
+  function springStep() {
+    const dt = 1 / 60;
+    const force =
+      -SPRING_STIFFNESS * (springPos - springTarget) -
+      SPRING_DAMPING * springVel;
+    springVel += (force / SPRING_MASS) * dt;
+    springPos += springVel * dt;
+
+    if (
+      Math.abs(springPos - springTarget) < 0.05 &&
+      Math.abs(springVel) < 0.05
+    ) {
+      springPos = springTarget;
+      springVel = 0;
+      applyCartTransform(springPos);
+      springRaf = null;
+      return;
+    }
+    applyCartTransform(springPos);
+    springRaf = requestAnimationFrame(springStep);
+  }
+
+  function applyCartTransform(pct) {
+    if (!cartDrawer) return;
+    if (isMobile()) {
+      cartDrawer.style.transform = `translateY(${pct}%)`;
+    } else {
+      cartDrawer.style.transform = `translateX(${pct}%)`;
+    }
+  }
+
+  function springTo(target) {
+    springTarget = target;
+    if (springRaf) cancelAnimationFrame(springRaf);
+    if (prefersReducedMotion) {
+      springPos = target;
+      applyCartTransform(target);
+      return;
+    }
+    springRaf = requestAnimationFrame(springStep);
+  }
+
+  /* Initialise position without animation */
+  applyCartTransform(100);
+
+  const openCart = () => {
+    cartDrawer?.classList.add("show");
+    cartOverlay?.classList.add("show");
+    document.body.style.overflow = "hidden";
+    springTo(0);
+    trapFocus(cartDrawer);
+  };
+  const closeCart = () => {
+    springTo(isMobile() ? 100 : 100);
+    cartOverlay?.classList.remove("show");
+    document.body.style.overflow = "";
+    releaseFocus(cartDrawer);
+    /* Remove .show after spring settles */
+    setTimeout(() => {
+      if (springTarget === 100) cartDrawer?.classList.remove("show");
+    }, 700);
+  };
+
+  cartToggle?.addEventListener("click", openCart);
+  closeCartBtn?.addEventListener("click", closeCart);
+  cartOverlay?.addEventListener("click", closeCart);
+
   const PRICE = 50;
   const TIERS = [{ minQty: 3, discount: 0.15 }];
   let cartQty = parseInt(localStorage.getItem("hlc_cartQty") || "0");
@@ -312,7 +470,6 @@ document.addEventListener("DOMContentLoaded", () => {
   let promoCode = "";
   const PROMO_CODES = { NATURE10: 0.1, SAVE15: 0.15 };
 
-  /* Restore saved promo on load */
   const savedPromo = localStorage.getItem("hlc_promo");
   if (savedPromo && PROMO_CODES[savedPromo]) {
     promoApplied = true;
@@ -334,23 +491,6 @@ document.addEventListener("DOMContentLoaded", () => {
       fb.className = "promo-feedback success";
     }
   }
-
-  const openCart = () => {
-    cartDrawer?.classList.add("show");
-    cartOverlay?.classList.add("show");
-    document.body.style.overflow = "hidden";
-    trapFocus(cartDrawer);
-  };
-  const closeCart = () => {
-    cartDrawer?.classList.remove("show");
-    cartOverlay?.classList.remove("show");
-    document.body.style.overflow = "";
-    releaseFocus(cartDrawer);
-  };
-
-  cartToggle?.addEventListener("click", openCart);
-  closeCartBtn?.addEventListener("click", closeCart);
-  cartOverlay?.addEventListener("click", closeCart);
 
   document.querySelectorAll(".add-to-cart").forEach((btn) => {
     btn.addEventListener("click", () => {
@@ -408,15 +548,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  /* ── FIX 1: Discount clarity — promo and tier are
-     now additive up to a cap, and the UI always tells
-     the user exactly which savings are applied.       */
   function getEffectiveDiscount(qty) {
     const tierDisc = getTierDiscount(qty);
-    if (promoApplied && tierDisc > 0) {
-      /* Both active: apply promo on top of tier, capped at 25% */
+    if (promoApplied && tierDisc > 0)
       return Math.min(tierDisc + promoDiscount, 0.25);
-    }
     if (promoApplied) return promoDiscount;
     return tierDisc;
   }
@@ -428,11 +563,19 @@ document.addEventListener("DOMContentLoaded", () => {
     return "Tier (3+ units)";
   }
 
-  function updateCart() {
+  /* ── CART BADGE POP ──────────────────────────── */
+  function popBadge() {
+    if (!cartBadge || prefersReducedMotion) return;
+    cartBadge.classList.remove("pop");
+    void cartBadge.offsetWidth; /* reflow to restart animation */
+    cartBadge.classList.add("pop");
+    setTimeout(() => cartBadge.classList.remove("pop"), 400);
+  }
+
+  function updateCart(triggerPop = false) {
     localStorage.setItem("hlc_cartQty", cartQty);
     const isEmpty = cartQty === 0;
     const effectiveDisc = getEffectiveDiscount(cartQty);
-    const tierDisc = getTierDiscount(cartQty);
     const subtotal = cartQty * PRICE;
     const discount = Math.round(subtotal * effectiveDisc);
     const total = subtotal - discount;
@@ -443,7 +586,6 @@ document.addEventListener("DOMContentLoaded", () => {
     cartPromoWrap?.classList.toggle("hidden", isEmpty);
     cartFooter?.classList.toggle("cart-footer--disabled", isEmpty);
 
-    /* Tier nudge */
     if (qtyTierNudge && qtyTierMsg) {
       if (!isEmpty && cartQty < 3) {
         const need = 3 - cartQty;
@@ -462,11 +604,13 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (qtyValueEl) qtyValueEl.textContent = cartQty;
-    if (cartBadge) cartBadge.textContent = cartQty;
+    if (cartBadge) {
+      cartBadge.textContent = cartQty;
+      if (triggerPop) popBadge();
+    }
 
     const cartItemTotalPrice = document.querySelector(".cart-item-total-price");
     if (cartItemTotalPrice) cartItemTotalPrice.textContent = subtotal;
-
     if (cartSubtotalEl) cartSubtotalEl.textContent = subtotal;
     if (totalEl) totalEl.textContent = `₹${total}`;
     if (cartHeaderSub)
@@ -482,12 +626,10 @@ document.addEventListener("DOMContentLoaded", () => {
     if (cartPromoSaving) cartPromoSaving.textContent = `−₹${discount}`;
     if (cartPromoLabel) cartPromoLabel.textContent = getDiscountLabel(cartQty);
 
-    /* Sticky price: show final per-unit price when any discount applies */
     if (stickyBuyPrice) {
       if (effectiveDisc > 0) {
         const discountedUnit = Math.round(PRICE * (1 - effectiveDisc));
-        const label = getDiscountLabel(cartQty);
-        stickyBuyPrice.textContent = `₹${discountedUnit} after ${label} · 10g`;
+        stickyBuyPrice.textContent = `₹${discountedUnit} after ${getDiscountLabel(cartQty)} · 10g`;
       } else {
         stickyBuyPrice.textContent = "₹50 · 10g";
       }
@@ -500,11 +642,18 @@ document.addEventListener("DOMContentLoaded", () => {
         : `Cart updated: ${cartQty} item${cartQty > 1 ? "s" : ""}, total ₹${total}`;
   }
 
+  /* patch qty listeners to also pop badge */
+  document
+    .querySelector(".qty-btn.plus")
+    ?.addEventListener("click", () => popBadge());
+  document
+    .querySelector(".qty-btn.minus")
+    ?.addEventListener("click", () => popBadge());
+
   /* ── PROMO CODE ──────────────────────────────── */
   const promoCodeInput = document.getElementById("promoCodeInput");
   const promoApplyBtn = document.getElementById("promoApplyBtn");
   const promoFeedback = document.getElementById("promoFeedback");
-
   promoApplyBtn?.addEventListener("click", applyPromo);
   promoCodeInput?.addEventListener("keydown", (e) => {
     if (e.key === "Enter") applyPromo();
@@ -525,9 +674,7 @@ document.addEventListener("DOMContentLoaded", () => {
       localStorage.setItem("hlc_promo", entered);
       const tierDisc = getTierDiscount(cartQty);
       let msg = `✓ ${entered} applied — ${Math.round(promoDiscount * 100)}% off!`;
-      if (tierDisc > 0) {
-        msg += ` Combined with 15% tier discount.`;
-      }
+      if (tierDisc > 0) msg += ` Combined with 15% tier discount.`;
       promoFeedback.textContent = msg;
       promoFeedback.className = "promo-feedback success";
       promoCodeInput.value = entered;
@@ -544,22 +691,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     updateCart();
   }
-
-  /* ── COMPARISON TABLE SCROLL ─────────────────── */
-  const comparisonScroll = document.getElementById("comparisonScroll");
-  const tableScrollHint = document.getElementById("tableScrollHint");
-  function updateTableMask() {
-    if (!comparisonScroll) return;
-    const isOverflowing =
-      comparisonScroll.scrollWidth > comparisonScroll.clientWidth + 2;
-    if (tableScrollHint)
-      tableScrollHint.style.display = isOverflowing ? "flex" : "none";
-  }
-  comparisonScroll?.addEventListener("scroll", updateTableMask, {
-    passive: true,
-  });
-  window.addEventListener("resize", updateTableMask);
-  setTimeout(updateTableMask, 500);
 
   /* ── FOCUS TRAP ──────────────────────────────── */
   function trapFocus(modal) {
@@ -597,6 +728,84 @@ document.addEventListener("DOMContentLoaded", () => {
   const reviewSuccessModal = document.getElementById("reviewSuccess");
   const modalReplyEmail = document.getElementById("modalReplyEmail");
 
+  /* ── CONFETTI ────────────────────────────────── */
+  const confettiCanvas = document.getElementById("confettiCanvas");
+  const confettiCtx = confettiCanvas?.getContext("2d");
+  const CONFETTI_COLORS = [
+    "#2a8c6e",
+    "#c8a96e",
+    "#3aad87",
+    "#1a6b52",
+    "#e4f5ee",
+    "#d4b87a",
+  ];
+
+  function launchConfetti() {
+    if (!confettiCanvas || !confettiCtx || prefersReducedMotion) return;
+    confettiCanvas.style.display = "block";
+    confettiCanvas.width = window.innerWidth;
+    confettiCanvas.height = window.innerHeight;
+
+    /* Create 55 particles — tasteful, not overwhelming */
+    const particles = Array.from({ length: 55 }, () => ({
+      x: confettiCanvas.width / 2 + (Math.random() - 0.5) * 200,
+      y: confettiCanvas.height * 0.4,
+      vx: (Math.random() - 0.5) * 8,
+      vy: -(Math.random() * 7 + 4),
+      size: Math.random() * 6 + 4,
+      color:
+        CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)],
+      rotation: Math.random() * 360,
+      rotVel: (Math.random() - 0.5) * 8,
+      opacity: 1,
+      shape: Math.random() > 0.5 ? "rect" : "circle",
+    }));
+
+    let startTime = null;
+    const DURATION = 2200;
+
+    function drawConfetti(ts) {
+      if (!startTime) startTime = ts;
+      const elapsed = ts - startTime;
+      confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+
+      particles.forEach((p) => {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.22; /* gravity */
+        p.rotation += p.rotVel;
+        p.opacity = Math.max(0, 1 - (elapsed / DURATION) * 1.2);
+
+        confettiCtx.save();
+        confettiCtx.globalAlpha = p.opacity;
+        confettiCtx.translate(p.x, p.y);
+        confettiCtx.rotate((p.rotation * Math.PI) / 180);
+        confettiCtx.fillStyle = p.color;
+        if (p.shape === "rect") {
+          confettiCtx.fillRect(-p.size / 2, -p.size / 4, p.size, p.size / 2);
+        } else {
+          confettiCtx.beginPath();
+          confettiCtx.arc(0, 0, p.size / 2, 0, Math.PI * 2);
+          confettiCtx.fill();
+        }
+        confettiCtx.restore();
+      });
+
+      if (elapsed < DURATION) {
+        requestAnimationFrame(drawConfetti);
+      } else {
+        confettiCtx.clearRect(
+          0,
+          0,
+          confettiCanvas.width,
+          confettiCanvas.height,
+        );
+        confettiCanvas.style.display = "none";
+      }
+    }
+    requestAnimationFrame(drawConfetti);
+  }
+
   document.getElementById("checkoutBtn")?.addEventListener("click", () => {
     if (cartQty === 0) return;
     closeCart();
@@ -604,6 +813,10 @@ document.addEventListener("DOMContentLoaded", () => {
     localStorage.removeItem("hlc_cartQty");
     resetPromoUI();
     updateCart();
+    setTimeout(
+      () => launchConfetti(),
+      400,
+    ); /* slight delay for drawer to close */
     orderSuccess?.classList.add("show");
     if (orderSuccess) trapFocus(orderSuccess);
     setTimeout(() => {
@@ -642,6 +855,17 @@ document.addEventListener("DOMContentLoaded", () => {
       closeCart();
       return;
     }
+    const expandedCard = document.querySelector(".ingredient-card.expanded");
+    if (expandedCard) {
+      expandedCard.classList.remove("expanded");
+      expandedCard
+        .querySelector(".ingredient-overlay")
+        ?.setAttribute("aria-expanded", "false");
+      expandedCard
+        .querySelector(".ingredient-expand")
+        ?.setAttribute("aria-hidden", "true");
+      return;
+    }
     [orderSuccess, contactSuccessModal, reviewSuccessModal].forEach((modal) => {
       if (modal?.classList.contains("show")) {
         modal.classList.remove("show");
@@ -653,10 +877,6 @@ document.addEventListener("DOMContentLoaded", () => {
   /* ── CONTACT FORM ────────────────────────────── */
   const contactForm = document.getElementById("contactForm");
   const formSubmitError = document.getElementById("formSubmitError");
-
-  /* ── FIX 2: Only validate fields the user has
-     touched (blurred at least once). On submit we
-     force-validate everything.                       */
   const touchedFields = new Set();
 
   function validateField(input, force = false) {
@@ -690,9 +910,7 @@ document.addEventListener("DOMContentLoaded", () => {
   contactForm?.addEventListener("submit", async (e) => {
     e.preventDefault();
     const fields = [...contactForm.querySelectorAll("input, textarea")];
-    /* Force-validate all on submit regardless of touched state */
     if (!fields.map((f) => validateField(f, true)).every(Boolean)) return;
-
     const btn = contactForm.querySelector("button[type=submit]");
     btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending…';
     btn.disabled = true;
@@ -700,10 +918,8 @@ document.addEventListener("DOMContentLoaded", () => {
       formSubmitError.textContent = "";
       formSubmitError.className = "form-submit-error";
     }
-
     const emailVal = contactForm.querySelector("#email")?.value?.trim();
     if (modalReplyEmail && emailVal) modalReplyEmail.textContent = emailVal;
-
     try {
       const res = await fetch(contactForm.action, {
         method: "POST",
@@ -805,6 +1021,54 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
+  /* ── MOBILE REVIEW SNAP SCROLL DOTS ─────────── */
+  const reviewGrid = document.getElementById("reviewGrid");
+  const reviewScrollDots = document.getElementById("reviewScrollDots");
+
+  function initReviewDots() {
+    if (!reviewGrid || !reviewScrollDots) return;
+    if (window.innerWidth > 768) {
+      reviewScrollDots.innerHTML = "";
+      return;
+    }
+    const cards = [...reviewGrid.querySelectorAll(".review-card")];
+    reviewScrollDots.innerHTML = "";
+    cards.forEach((_, i) => {
+      const dot = document.createElement("button");
+      dot.className = "review-dot" + (i === 0 ? " active" : "");
+      dot.setAttribute("aria-label", `Go to review ${i + 1}`);
+      dot.addEventListener("click", () => {
+        const card = cards[i];
+        reviewGrid.scrollTo({ left: card.offsetLeft - 20, behavior: "smooth" });
+      });
+      reviewScrollDots.appendChild(dot);
+    });
+  }
+
+  reviewGrid?.addEventListener(
+    "scroll",
+    () => {
+      if (window.innerWidth > 768) return;
+      const cards = [...reviewGrid.querySelectorAll(".review-card")];
+      const dots = [...reviewScrollDots.querySelectorAll(".review-dot")];
+      const scrollLeft = reviewGrid.scrollLeft;
+      let closest = 0;
+      let minDist = Infinity;
+      cards.forEach((card, i) => {
+        const dist = Math.abs(card.offsetLeft - 20 - scrollLeft);
+        if (dist < minDist) {
+          minDist = dist;
+          closest = i;
+        }
+      });
+      dots.forEach((d, i) => d.classList.toggle("active", i === closest));
+    },
+    { passive: true },
+  );
+
+  initReviewDots();
+  window.addEventListener("resize", initReviewDots);
+
   /* ── WRITE A REVIEW ──────────────────────────── */
   const writeReviewToggle = document.getElementById("writeReviewToggle");
   const writeReviewCancel = document.getElementById("writeReviewCancel");
@@ -816,7 +1080,6 @@ document.addEventListener("DOMContentLoaded", () => {
     writeReviewToggle.style.display = "none";
     writeReviewForm?.querySelector("input, textarea")?.focus();
   });
-
   writeReviewCancel?.addEventListener("click", () => {
     writeReviewForm?.classList.remove("open");
     writeReviewToggle.style.display = "";
@@ -858,7 +1121,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const name = document.getElementById("wr-name")?.value.trim();
     const rating = parseInt(document.getElementById("wr-rating")?.value || "0");
     const text = document.getElementById("wr-text")?.value.trim();
-
     if (!name || !text || rating === 0) {
       if (rating === 0) {
         const picker = document.querySelector(".star-picker");
@@ -867,12 +1129,10 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       return;
     }
-
     const grid = document.querySelector(".review-grid");
     const card = document.createElement("div");
     card.className = "review-card";
     card.style.animation = "reviewFadeIn 0.5s ease forwards";
-
     const starsHtml = Array.from(
       { length: 5 },
       (_, i) =>
@@ -885,7 +1145,6 @@ document.addEventListener("DOMContentLoaded", () => {
       { bg: "#e8f8ff", col: "#0b6b8c" },
     ];
     const p = palettes[Math.floor(Math.random() * palettes.length)];
-
     card.innerHTML = `
       <div class="review-top">
         <div class="review-avatar" style="--av-bg:${p.bg};--av-color:${p.col}">${name.charAt(0).toUpperCase()}</div>
@@ -898,13 +1157,12 @@ document.addEventListener("DOMContentLoaded", () => {
         <span class="helpful-count">0</span> people found this helpful
       </button>`;
     grid.insertBefore(card, grid.firstChild);
-
+    if (window.innerWidth <= 768) initReviewDots();
     writeReviewForm.reset();
     selectedRating = 0;
     resetStars();
     writeReviewForm.classList.remove("open");
     writeReviewToggle.style.display = "";
-
     reviewSuccessModal?.classList.add("show");
     if (reviewSuccessModal) trapFocus(reviewSuccessModal);
     setTimeout(() => {
@@ -914,13 +1172,9 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   /* ── INGREDIENT EXPAND PANELS ────────────────── */
-  /* ── FIX 3: Added Escape key handler to close
-     open ingredient panel, consistent with FAQ
-     and modal Escape behaviour.                      */
   document.querySelectorAll(".ingredient-overlay").forEach((overlay) => {
     const card = overlay.closest(".ingredient-card");
     const expandEl = card?.querySelector(".ingredient-expand");
-
     function toggleExpand() {
       const isOpen = card.classList.contains("expanded");
       document.querySelectorAll(".ingredient-card.expanded").forEach((c) => {
@@ -940,7 +1194,6 @@ document.addEventListener("DOMContentLoaded", () => {
         expandEl?.setAttribute("aria-hidden", "false");
       }
     }
-
     overlay.addEventListener("click", toggleExpand);
     overlay.addEventListener("keydown", (e) => {
       if (e.key === "Enter" || e.key === " ") {
@@ -948,21 +1201,6 @@ document.addEventListener("DOMContentLoaded", () => {
         toggleExpand();
       }
     });
-  });
-
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") {
-      const expandedCard = document.querySelector(".ingredient-card.expanded");
-      if (expandedCard) {
-        expandedCard.classList.remove("expanded");
-        expandedCard
-          .querySelector(".ingredient-overlay")
-          ?.setAttribute("aria-expanded", "false");
-        expandedCard
-          .querySelector(".ingredient-expand")
-          ?.setAttribute("aria-hidden", "true");
-      }
-    }
   });
 
   /* ── FAQ ─────────────────────────────────────── */
@@ -981,7 +1219,52 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
+  /* ── TOOLTIP ─────────────────────────────────── */
+  const tooltipBox = document.getElementById("hlcTooltipBox");
+  let tooltipTimeout = null;
+
+  document.querySelectorAll(".hlc-tooltip").forEach((el) => {
+    const text = el.getAttribute("data-tooltip");
+    if (!text || !tooltipBox) return;
+
+    function showTooltip(e) {
+      clearTimeout(tooltipTimeout);
+      tooltipBox.textContent = text;
+      tooltipBox.classList.add("show");
+      positionTooltip(e);
+    }
+    function hideTooltip() {
+      tooltipTimeout = setTimeout(
+        () => tooltipBox.classList.remove("show"),
+        120,
+      );
+    }
+    function positionTooltip(e) {
+      const rect = el.getBoundingClientRect();
+      const boxW = 220;
+      let left = rect.left + rect.width / 2 - boxW / 2;
+      left = Math.max(12, Math.min(left, window.innerWidth - boxW - 12));
+      const top =
+        rect.top -
+        8; /* position above element; CSS translateY handles offset */
+      tooltipBox.style.left = left + "px";
+      tooltipBox.style.top = top + "px";
+      tooltipBox.style.transform = `translateY(calc(-100% + ${tooltipBox.classList.contains("show") ? "0px" : "6px"}))`;
+    }
+
+    el.addEventListener("mouseenter", showTooltip);
+    el.addEventListener("mouseleave", hideTooltip);
+    el.addEventListener("focus", showTooltip);
+    el.addEventListener("blur", hideTooltip);
+    el.addEventListener("mousemove", positionTooltip);
+  });
+
   /* ── INITIAL RENDER ──────────────────────────── */
   updateCart();
   updateScrollProgress();
+  if (!prefersReducedMotion) {
+    updateAboutScale(window.scrollY);
+    updateBenefitsSpotlight(window.scrollY);
+    updateHeroParallax(window.scrollY);
+  }
 }); // END DOMContentLoaded
