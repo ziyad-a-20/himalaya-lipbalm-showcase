@@ -391,8 +391,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const isMobile = () => window.innerWidth <= 768;
 
   /* Spring constants — feel: snappy open, bouncy settle */
-  const SPRING_STIFFNESS = 300;
-  const SPRING_DAMPING = 28;
+  const SPRING_STIFFNESS = 420;
+  const SPRING_DAMPING = 38;
   const SPRING_MASS = 1;
 
   function springStep() {
@@ -404,8 +404,8 @@ document.addEventListener("DOMContentLoaded", () => {
     springPos += springVel * dt;
 
     if (
-      Math.abs(springPos - springTarget) < 0.05 &&
-      Math.abs(springVel) < 0.05
+      Math.abs(springPos - springTarget) < 0.08 &&
+      Math.abs(springVel) < 0.08
     ) {
       springPos = springTarget;
       springVel = 0;
@@ -420,12 +420,15 @@ document.addEventListener("DOMContentLoaded", () => {
   function applyCartTransform(pct) {
     if (!cartDrawer) return;
     if (isMobile()) {
-      cartDrawer.style.transform = `translateY(${pct}%)`;
+      /* clamp so it never goes above viewport on overshoot */
+      const clamped = Math.max(-5, pct);
+      cartDrawer.style.transform = `translateY(${clamped}%)`;
     } else {
-      cartDrawer.style.transform = `translateX(${pct}%)`;
+      const clamped = Math.max(-2, pct);
+      cartDrawer.style.transform = `translateX(${clamped}%)`;
     }
   }
-
+  
   function springTo(target) {
     springTarget = target;
     if (springRaf) cancelAnimationFrame(springRaf);
@@ -441,6 +444,12 @@ document.addEventListener("DOMContentLoaded", () => {
   applyCartTransform(100);
 
   const openCart = () => {
+    /* Snap position to start of travel before springing so it never
+       appears mid-screen on repeated opens */
+    if (!cartDrawer?.classList.contains("show")) {
+      springPos = 100;
+      springVel = 0;
+    }
     cartDrawer?.classList.add("show");
     cartOverlay?.classList.add("show");
     document.body.style.overflow = "hidden";
