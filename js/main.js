@@ -166,7 +166,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!heroEl) return;
     const heroBottom = heroEl.offsetTop + heroEl.offsetHeight;
     if (sy > heroBottom) return;
-    /* card drifts upward at 0.35x scroll speed, creating depth */
     const offset = sy * 0.35;
     heroProductCard.style.transform = `translateY(-${offset}px)`;
   }
@@ -177,7 +176,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!aboutImgFrame) return;
     const rect = aboutImgFrame.getBoundingClientRect();
     const winH = window.innerHeight;
-    /* progress: 0 when bottom of frame enters viewport, 1 when centre reaches viewport centre */
     const progress = Math.min(Math.max((winH - rect.top) / (winH * 0.7), 0), 1);
     const scale = 0.95 + 0.05 * progress;
     aboutImgFrame.style.setProperty("--about-scale", scale);
@@ -193,12 +191,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const inView = rect.top < winH && rect.bottom > 0;
     benefitsSpotlight.classList.toggle("active", inView);
     if (!inView) return;
-    /* spotlight Y tracks viewport centre relative to section */
     const sectionProgress = Math.min(
       Math.max(-rect.top / (rect.height - winH), 0),
       1,
     );
-    const spotY = 20 + sectionProgress * 60; /* 20% → 80% */
+    const spotY = 20 + sectionProgress * 60;
     benefitsSpotlight.style.setProperty("--spot-x", "50%");
     benefitsSpotlight.style.setProperty("--spot-y", `${spotY}%`);
   }
@@ -209,7 +206,6 @@ document.addEventListener("DOMContentLoaded", () => {
       entries.forEach((entry) => {
         if (!entry.isIntersecting) return;
         const img = entry.target;
-        /* If src already set (non-lazy hero img) just mark loaded */
         if (img.complete) {
           img.classList.add("loaded");
         } else {
@@ -363,7 +359,9 @@ document.addEventListener("DOMContentLoaded", () => {
   wishlistBtn?.addEventListener("click", toggleWishlist);
   wishlistNavBtn?.addEventListener("click", toggleWishlist);
 
-  /* ── CART — SPRING PHYSICS ───────────────────── */
+  /* ══════════════════════════════════════════════
+     CART — SPRING PHYSICS
+  ══════════════════════════════════════════════ */
   const cartDrawer = document.getElementById("cartDrawer");
   const cartOverlay = document.getElementById("cartOverlay");
   const cartToggle = document.getElementById("cartToggle");
@@ -383,14 +381,15 @@ document.addEventListener("DOMContentLoaded", () => {
   const qtyTierMsg = document.getElementById("qtyTierMsg");
   const stickyBuyPrice = document.getElementById("stickyBuyPrice");
 
-  /* Spring state */
-  let springPos = 100; /* 0 = open, 100 = closed (percent) */
+  /* ── Spring state ── */
+  let springPos = 100;
   let springVel = 0;
   let springTarget = 100;
   let springRaf = null;
+
   const isMobile = () => window.innerWidth <= 768;
 
-  /* Spring constants — feel: snappy open, bouncy settle */
+  /* Snappy constants — higher stiffness = faster open */
   const SPRING_STIFFNESS = 420;
   const SPRING_DAMPING = 38;
   const SPRING_MASS = 1;
@@ -420,18 +419,22 @@ document.addEventListener("DOMContentLoaded", () => {
   function applyCartTransform(pct) {
     if (!cartDrawer) return;
     if (isMobile()) {
-      /* clamp so it never goes above viewport on overshoot */
-      const clamped = Math.max(-5, pct);
+      /* Mobile bottom-sheet: clamp so overshoot never goes above screen */
+      const clamped = Math.max(-5, Math.min(100, pct));
       cartDrawer.style.transform = `translateY(${clamped}%)`;
     } else {
-      const clamped = Math.max(-2, pct);
+      /* Desktop side-drawer */
+      const clamped = Math.max(-2, Math.min(100, pct));
       cartDrawer.style.transform = `translateX(${clamped}%)`;
     }
   }
-  
+
   function springTo(target) {
     springTarget = target;
-    if (springRaf) cancelAnimationFrame(springRaf);
+    if (springRaf) {
+      cancelAnimationFrame(springRaf);
+      springRaf = null;
+    }
     if (prefersReducedMotion) {
       springPos = target;
       applyCartTransform(target);
@@ -441,27 +444,41 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* Initialise position without animation */
+  springPos = 100;
+  springVel = 0;
+  springTarget = 100;
   applyCartTransform(100);
 
+  /* ── Open / Close ── */
   const openCart = () => {
-    /* Snap position to start of travel before springing so it never
-       appears mid-screen on repeated opens */
-    if (!cartDrawer?.classList.contains("show")) {
-      springPos = 100;
-      springVel = 0;
+    /* Always hard-reset spring before opening so no stale mid-position */
+    springPos = 100;
+    springVel = 0;
+    if (springRaf) {
+      cancelAnimationFrame(springRaf);
+      springRaf = null;
     }
+
     cartDrawer?.classList.add("show");
     cartOverlay?.classList.add("show");
     document.body.style.overflow = "hidden";
-    springTo(0);
+
+    /* Two rAF frames: first paints the initial off-screen position,
+       second triggers the spring so the browser never skips frame 0 */
+    requestAnimationFrame(() => {
+      applyCartTransform(100);
+      requestAnimationFrame(() => springTo(0));
+    });
+
     trapFocus(cartDrawer);
   };
+
   const closeCart = () => {
-    springTo(isMobile() ? 100 : 100);
+    springTo(100);
     cartOverlay?.classList.remove("show");
     document.body.style.overflow = "";
     releaseFocus(cartDrawer);
-    /* Remove .show after spring settles */
+    /* Remove .show only after spring fully settles */
     setTimeout(() => {
       if (springTarget === 100) cartDrawer?.classList.remove("show");
     }, 700);
@@ -471,6 +488,7 @@ document.addEventListener("DOMContentLoaded", () => {
   closeCartBtn?.addEventListener("click", closeCart);
   cartOverlay?.addEventListener("click", closeCart);
 
+  /* ── Cart data ── */
   const PRICE = 50;
   const TIERS = [{ minQty: 3, discount: 0.15 }];
   let cartQty = parseInt(localStorage.getItem("hlc_cartQty") || "0");
@@ -479,6 +497,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let promoCode = "";
   const PROMO_CODES = { NATURE10: 0.1, SAVE15: 0.15 };
 
+  /* Restore saved promo */
   const savedPromo = localStorage.getItem("hlc_promo");
   if (savedPromo && PROMO_CODES[savedPromo]) {
     promoApplied = true;
@@ -501,6 +520,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  /* Add to cart buttons */
   document.querySelectorAll(".add-to-cart").forEach((btn) => {
     btn.addEventListener("click", () => {
       if (cartQty === 0) {
@@ -516,11 +536,13 @@ document.addEventListener("DOMContentLoaded", () => {
   document.querySelector(".qty-btn.plus")?.addEventListener("click", () => {
     cartQty++;
     updateCart();
+    popBadge();
   });
   document.querySelector(".qty-btn.minus")?.addEventListener("click", () => {
     if (cartQty > 1) {
       cartQty--;
       updateCart();
+      popBadge();
     }
   });
   removeItemBtn?.addEventListener("click", () => {
@@ -572,16 +594,17 @@ document.addEventListener("DOMContentLoaded", () => {
     return "Tier (3+ units)";
   }
 
-  /* ── CART BADGE POP ──────────────────────────── */
+  /* ── Cart badge pop ── */
   function popBadge() {
     if (!cartBadge || prefersReducedMotion) return;
     cartBadge.classList.remove("pop");
-    void cartBadge.offsetWidth; /* reflow to restart animation */
+    void cartBadge.offsetWidth;
     cartBadge.classList.add("pop");
     setTimeout(() => cartBadge.classList.remove("pop"), 400);
   }
 
-  function updateCart(triggerPop = false) {
+  /* ── Update cart UI ── */
+  function updateCart() {
     localStorage.setItem("hlc_cartQty", cartQty);
     const isEmpty = cartQty === 0;
     const effectiveDisc = getEffectiveDiscount(cartQty);
@@ -613,10 +636,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (qtyValueEl) qtyValueEl.textContent = cartQty;
-    if (cartBadge) {
-      cartBadge.textContent = cartQty;
-      if (triggerPop) popBadge();
-    }
+    if (cartBadge) cartBadge.textContent = cartQty;
 
     const cartItemTotalPrice = document.querySelector(".cart-item-total-price");
     if (cartItemTotalPrice) cartItemTotalPrice.textContent = subtotal;
@@ -650,14 +670,6 @@ document.addEventListener("DOMContentLoaded", () => {
         ? "Cart is now empty"
         : `Cart updated: ${cartQty} item${cartQty > 1 ? "s" : ""}, total ₹${total}`;
   }
-
-  /* patch qty listeners to also pop badge */
-  document
-    .querySelector(".qty-btn.plus")
-    ?.addEventListener("click", () => popBadge());
-  document
-    .querySelector(".qty-btn.minus")
-    ?.addEventListener("click", () => popBadge());
 
   /* ── PROMO CODE ──────────────────────────────── */
   const promoCodeInput = document.getElementById("promoCodeInput");
@@ -755,7 +767,6 @@ document.addEventListener("DOMContentLoaded", () => {
     confettiCanvas.width = window.innerWidth;
     confettiCanvas.height = window.innerHeight;
 
-    /* Create 55 particles — tasteful, not overwhelming */
     const particles = Array.from({ length: 55 }, () => ({
       x: confettiCanvas.width / 2 + (Math.random() - 0.5) * 200,
       y: confettiCanvas.height * 0.4,
@@ -781,7 +792,7 @@ document.addEventListener("DOMContentLoaded", () => {
       particles.forEach((p) => {
         p.x += p.vx;
         p.y += p.vy;
-        p.vy += 0.22; /* gravity */
+        p.vy += 0.22;
         p.rotation += p.rotVel;
         p.opacity = Math.max(0, 1 - (elapsed / DURATION) * 1.2);
 
@@ -822,10 +833,7 @@ document.addEventListener("DOMContentLoaded", () => {
     localStorage.removeItem("hlc_cartQty");
     resetPromoUI();
     updateCart();
-    setTimeout(
-      () => launchConfetti(),
-      400,
-    ); /* slight delay for drawer to close */
+    setTimeout(() => launchConfetti(), 400);
     orderSuccess?.classList.add("show");
     if (orderSuccess) trapFocus(orderSuccess);
     setTimeout(() => {
@@ -1061,8 +1069,8 @@ document.addEventListener("DOMContentLoaded", () => {
       const cards = [...reviewGrid.querySelectorAll(".review-card")];
       const dots = [...reviewScrollDots.querySelectorAll(".review-dot")];
       const scrollLeft = reviewGrid.scrollLeft;
-      let closest = 0;
-      let minDist = Infinity;
+      let closest = 0,
+        minDist = Infinity;
       cards.forEach((card, i) => {
         const dist = Math.abs(card.offsetLeft - 20 - scrollLeft);
         if (dist < minDist) {
@@ -1253,9 +1261,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const boxW = 220;
       let left = rect.left + rect.width / 2 - boxW / 2;
       left = Math.max(12, Math.min(left, window.innerWidth - boxW - 12));
-      const top =
-        rect.top -
-        8; /* position above element; CSS translateY handles offset */
+      const top = rect.top - 8;
       tooltipBox.style.left = left + "px";
       tooltipBox.style.top = top + "px";
       tooltipBox.style.transform = `translateY(calc(-100% + ${tooltipBox.classList.contains("show") ? "0px" : "6px"}))`;
