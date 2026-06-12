@@ -2772,9 +2772,12 @@ textarea:focus {
   z-index: 1600;
   display: flex;
   flex-direction: row;
-  box-shadow: -20px 0 70px rgba(0,0,0,0.22);
-  transform: translateX(100%);
+  box-shadow: -20px 0 70px rgba(0, 0, 0, 0.22);
+  transform: translate3d(100%, 0, 0);
   transition: none;
+  will-change: transform;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 .cart-drawer.cart-ready {
   /* Only apply CSS transition after first JS frame to prevent flash */
@@ -3938,6 +3941,8 @@ tr[data-aos] {
     border-radius: 20px 20px 0 0;
     flex-direction: column;
     box-shadow: 0 -20px 70px rgba(0, 0, 0, 0.3);
+    transform: translate3d(0, 100%, 0);
+    contain: layout style paint;
   }
   .cart-sidebar-strip {
     width: 100%;

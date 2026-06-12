@@ -13,7 +13,6 @@ window.addEventListener("load", () => {
 });
 
 document.addEventListener("DOMContentLoaded", () => {
-
   /* ── REDUCED MOTION CHECK ────────────────────── */
   const prefersReducedMotion = window.matchMedia(
     "(prefers-reduced-motion: reduce)",
@@ -177,10 +176,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!aboutImgFrame) return;
     const rect = aboutImgFrame.getBoundingClientRect();
     const winH = window.innerHeight;
-    const progress = Math.min(
-      Math.max((winH - rect.top) / (winH * 0.7), 0),
-      1,
-    );
+    const progress = Math.min(Math.max((winH - rect.top) / (winH * 0.7), 0), 1);
     const scale = 0.95 + 0.05 * progress;
     aboutImgFrame.style.setProperty("--about-scale", scale);
   }
@@ -366,51 +362,49 @@ document.addEventListener("DOMContentLoaded", () => {
   /* ══════════════════════════════════════════════
      CART — SPRING PHYSICS
   ══════════════════════════════════════════════ */
-  const cartDrawer   = document.getElementById("cartDrawer");
-  const cartOverlay  = document.getElementById("cartOverlay");
-  const cartToggle   = document.getElementById("cartToggle");
+  const cartDrawer = document.getElementById("cartDrawer");
+  const cartOverlay = document.getElementById("cartOverlay");
+  const cartToggle = document.getElementById("cartToggle");
   const closeCartBtn = document.getElementById("closeCart");
-  const cartSuccess  = document.getElementById("cartSuccess");
-  const qtyValueEl   = document.querySelector(".qty-value");
-  const cartBadge    = document.getElementById("cartBadge");
-  const cartHeaderSub    = document.getElementById("cartHeaderSub");
-  const cartSubtotalEl   = document.querySelector(".cartSubtotal");
-  const totalEl          = document.querySelector(".cartTotal");
-  const cartItem         = document.getElementById("cartItem");
-  const cartEmpty        = document.getElementById("cartEmpty");
-  const cartFooter       = document.getElementById("cartFooter");
-  const removeItemBtn    = document.getElementById("removeItemBtn");
-  const cartPromoWrap    = document.getElementById("cartPromoWrap");
-  const qtyTierNudge     = document.getElementById("qtyTierNudge");
-  const qtyTierMsg       = document.getElementById("qtyTierMsg");
-  const stickyBuyPrice   = document.getElementById("stickyBuyPrice");
+  const cartSuccess = document.getElementById("cartSuccess");
+  const qtyValueEl = document.querySelector(".qty-value");
+  const cartBadge = document.getElementById("cartBadge");
+  const cartHeaderSub = document.getElementById("cartHeaderSub");
+  const cartSubtotalEl = document.querySelector(".cartSubtotal");
+  const totalEl = document.querySelector(".cartTotal");
+  const cartItem = document.getElementById("cartItem");
+  const cartEmpty = document.getElementById("cartEmpty");
+  const cartFooter = document.getElementById("cartFooter");
+  const removeItemBtn = document.getElementById("removeItemBtn");
+  const cartPromoWrap = document.getElementById("cartPromoWrap");
+  const qtyTierNudge = document.getElementById("qtyTierNudge");
+  const qtyTierMsg = document.getElementById("qtyTierMsg");
+  const stickyBuyPrice = document.getElementById("stickyBuyPrice");
 
   /* ── Spring state ── */
-  let springPos    = 100;
-  let springVel    = 0;
+  let springPos = 100;
+  let springVel = 0;
   let springTarget = 100;
-  let springRaf    = null;
+  let springRaf = null;
 
   const isMobile = () => window.innerWidth <= 768;
 
-  /* ── Spring constants ──
-     High stiffness + moderate damping = instant feeling open,
-     natural settle. No bounce on mobile (overdamped feel). */
-  const SPRING_STIFFNESS = 500;
-  const SPRING_DAMPING   = 48;
-  const SPRING_MASS      = 1;
+  /* Snappy constants — higher stiffness = faster open */
+  const SPRING_STIFFNESS = 520;
+  const SPRING_DAMPING = 42;
+  const SPRING_MASS = 1;
 
   function springStep() {
-    const dt    = 1 / 60;
-    const force = -SPRING_STIFFNESS * (springPos - springTarget)
-                  - SPRING_DAMPING * springVel;
+    const dt = 1 / 60;
+    const force =
+      -SPRING_STIFFNESS * (springPos - springTarget) -
+      SPRING_DAMPING * springVel;
     springVel += (force / SPRING_MASS) * dt;
     springPos += springVel * dt;
 
-    /* Settle threshold — slightly loose so RAF exits fast */
     if (
-      Math.abs(springPos - springTarget) < 0.1 &&
-      Math.abs(springVel) < 0.1
+      Math.abs(springPos - springTarget) < 0.08 &&
+      Math.abs(springVel) < 0.08
     ) {
       springPos = springTarget;
       springVel = 0;
@@ -425,10 +419,11 @@ document.addEventListener("DOMContentLoaded", () => {
   function applyCartTransform(pct) {
     if (!cartDrawer) return;
     if (isMobile()) {
-      /* clamp: never above screen on overshoot, never below 100% */
-      const clamped = Math.max(-3, Math.min(100, pct));
+      /* Mobile bottom-sheet: clamp so overshoot never goes above screen */
+      const clamped = Math.max(-5, Math.min(100, pct));
       cartDrawer.style.transform = `translateY(${clamped}%)`;
     } else {
+      /* Desktop side-drawer */
       const clamped = Math.max(-2, Math.min(100, pct));
       cartDrawer.style.transform = `translateX(${clamped}%)`;
     }
@@ -448,37 +443,38 @@ document.addEventListener("DOMContentLoaded", () => {
     springRaf = requestAnimationFrame(springStep);
   }
 
-  /* Hard-set initial off-screen position synchronously */
+  /* Initialise position without animation */
   springPos = 100;
   springVel = 0;
   springTarget = 100;
   applyCartTransform(100);
 
-  /* ── Open cart ──
-     Key insight: set visibility:hidden on the drawer in CSS by default,
-     flip to visible here AFTER we've already painted it at translateY(100%),
-     then start the spring. This avoids any frame where the drawer is
-     visible at the wrong position. */
+  /* ── Open / Close ── */
   const openCart = () => {
-    /* 1. Hard reset spring state */
     springPos = 100;
     springVel = 0;
+
     if (springRaf) {
       cancelAnimationFrame(springRaf);
       springRaf = null;
     }
 
-    /* 2. Apply off-screen transform synchronously BEFORE .show */
-    applyCartTransform(100);
-
-    /* 3. Make drawer visible and show overlay */
     cartDrawer?.classList.add("show");
     cartOverlay?.classList.add("show");
     document.body.style.overflow = "hidden";
 
-    /* 4. Start spring immediately — no rAF delay needed because
-       we already set the transform before making it visible */
-    springTo(0);
+    /* Force initial position immediately */
+    applyCartTransform(100);
+
+    /* Start animation right away */
+    springPos = 100;
+    springTarget = 0;
+
+    if (prefersReducedMotion) {
+      applyCartTransform(0);
+    } else {
+      springRaf = requestAnimationFrame(springStep);
+    }
 
     trapFocus(cartDrawer);
   };
@@ -488,10 +484,10 @@ document.addEventListener("DOMContentLoaded", () => {
     cartOverlay?.classList.remove("show");
     document.body.style.overflow = "";
     releaseFocus(cartDrawer);
-    /* Hide drawer after spring fully settles */
+    /* Remove .show only after spring fully settles */
     setTimeout(() => {
       if (springTarget === 100) cartDrawer?.classList.remove("show");
-    }, 600);
+    }, 700);
   };
 
   cartToggle?.addEventListener("click", openCart);
@@ -501,33 +497,42 @@ document.addEventListener("DOMContentLoaded", () => {
   /* ── Cart data ── */
   const PRICE = 50;
   const TIERS = [{ minQty: 3, discount: 0.15 }];
-  let cartQty      = parseInt(localStorage.getItem("hlc_cartQty") || "0");
+  let cartQty = parseInt(localStorage.getItem("hlc_cartQty") || "0");
   let promoApplied = false;
   let promoDiscount = 0;
-  let promoCode    = "";
+  let promoCode = "";
   const PROMO_CODES = { NATURE10: 0.1, SAVE15: 0.15 };
 
   /* Restore saved promo */
   const savedPromo = localStorage.getItem("hlc_promo");
   if (savedPromo && PROMO_CODES[savedPromo]) {
-    promoApplied  = true;
+    promoApplied = true;
     promoDiscount = PROMO_CODES[savedPromo];
-    promoCode     = savedPromo;
+    promoCode = savedPromo;
     const inp = document.getElementById("promoCodeInput");
     const btn = document.getElementById("promoApplyBtn");
-    const fb  = document.getElementById("promoFeedback");
-    if (inp) { inp.value = savedPromo; inp.disabled = true; }
-    if (btn) { btn.textContent = "Applied"; btn.disabled = true; }
+    const fb = document.getElementById("promoFeedback");
+    if (inp) {
+      inp.value = savedPromo;
+      inp.disabled = true;
+    }
+    if (btn) {
+      btn.textContent = "Applied";
+      btn.disabled = true;
+    }
     if (fb) {
       fb.textContent = `✓ ${savedPromo} applied — ${Math.round(promoDiscount * 100)}% off!`;
-      fb.className   = "promo-feedback success";
+      fb.className = "promo-feedback success";
     }
   }
 
   /* Add to cart buttons */
   document.querySelectorAll(".add-to-cart").forEach((btn) => {
     btn.addEventListener("click", () => {
-      if (cartQty === 0) { cartQty = 1; updateCart(); }
+      if (cartQty === 0) {
+        cartQty = 1;
+        updateCart();
+      }
       openCart();
       cartSuccess?.classList.add("show");
       setTimeout(() => cartSuccess?.classList.remove("show"), 3000);
@@ -540,7 +545,11 @@ document.addEventListener("DOMContentLoaded", () => {
     popBadge();
   });
   document.querySelector(".qty-btn.minus")?.addEventListener("click", () => {
-    if (cartQty > 1) { cartQty--; updateCart(); popBadge(); }
+    if (cartQty > 1) {
+      cartQty--;
+      updateCart();
+      popBadge();
+    }
   });
   removeItemBtn?.addEventListener("click", () => {
     cartQty = 0;
@@ -555,21 +564,31 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function resetPromoUI() {
-    promoApplied  = false;
+    promoApplied = false;
     promoDiscount = 0;
-    promoCode     = "";
+    promoCode = "";
     localStorage.removeItem("hlc_promo");
     const inp = document.getElementById("promoCodeInput");
     const btn = document.getElementById("promoApplyBtn");
-    const fb  = document.getElementById("promoFeedback");
-    if (inp) { inp.value = ""; inp.disabled = false; }
-    if (btn) { btn.textContent = "Apply"; btn.disabled = false; }
-    if (fb)  { fb.textContent = ""; fb.className = "promo-feedback"; }
+    const fb = document.getElementById("promoFeedback");
+    if (inp) {
+      inp.value = "";
+      inp.disabled = false;
+    }
+    if (btn) {
+      btn.textContent = "Apply";
+      btn.disabled = false;
+    }
+    if (fb) {
+      fb.textContent = "";
+      fb.className = "promo-feedback";
+    }
   }
 
   function getEffectiveDiscount(qty) {
     const tierDisc = getTierDiscount(qty);
-    if (promoApplied && tierDisc > 0) return Math.min(tierDisc + promoDiscount, 0.25);
+    if (promoApplied && tierDisc > 0)
+      return Math.min(tierDisc + promoDiscount, 0.25);
     if (promoApplied) return promoDiscount;
     return tierDisc;
   }
@@ -593,11 +612,11 @@ document.addEventListener("DOMContentLoaded", () => {
   /* ── Update cart UI ── */
   function updateCart() {
     localStorage.setItem("hlc_cartQty", cartQty);
-    const isEmpty       = cartQty === 0;
+    const isEmpty = cartQty === 0;
     const effectiveDisc = getEffectiveDiscount(cartQty);
-    const subtotal      = cartQty * PRICE;
-    const discount      = Math.round(subtotal * effectiveDisc);
-    const total         = subtotal - discount;
+    const subtotal = cartQty * PRICE;
+    const discount = Math.round(subtotal * effectiveDisc);
+    const total = subtotal - discount;
 
     cartItem?.classList.toggle("hidden", isEmpty);
     cartEmpty?.classList.toggle("hidden", !isEmpty);
@@ -622,25 +641,25 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
-    if (qtyValueEl)  qtyValueEl.textContent  = cartQty;
-    if (cartBadge)   cartBadge.textContent    = cartQty;
+    if (qtyValueEl) qtyValueEl.textContent = cartQty;
+    if (cartBadge) cartBadge.textContent = cartQty;
 
     const cartItemTotalPrice = document.querySelector(".cart-item-total-price");
     if (cartItemTotalPrice) cartItemTotalPrice.textContent = subtotal;
-    if (cartSubtotalEl)     cartSubtotalEl.textContent     = subtotal;
-    if (totalEl)            totalEl.textContent            = `₹${total}`;
+    if (cartSubtotalEl) cartSubtotalEl.textContent = subtotal;
+    if (totalEl) totalEl.textContent = `₹${total}`;
     if (cartHeaderSub)
       cartHeaderSub.textContent = isEmpty
         ? "0 items"
         : `${cartQty} item${cartQty > 1 ? "s" : ""} · ₹${total}`;
 
-    const cartPromoRow    = document.getElementById("cartPromoRow");
+    const cartPromoRow = document.getElementById("cartPromoRow");
     const cartPromoSaving = document.getElementById("cartPromoSaving");
-    const cartPromoLabel  = document.getElementById("cartPromoLabel");
-    const hasDiscount     = effectiveDisc > 0 && !isEmpty;
+    const cartPromoLabel = document.getElementById("cartPromoLabel");
+    const hasDiscount = effectiveDisc > 0 && !isEmpty;
     cartPromoRow?.classList.toggle("hidden", !hasDiscount);
     if (cartPromoSaving) cartPromoSaving.textContent = `−₹${discount}`;
-    if (cartPromoLabel)  cartPromoLabel.textContent  = getDiscountLabel(cartQty);
+    if (cartPromoLabel) cartPromoLabel.textContent = getDiscountLabel(cartQty);
 
     if (stickyBuyPrice) {
       if (effectiveDisc > 0) {
@@ -660,8 +679,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /* ── PROMO CODE ──────────────────────────────── */
   const promoCodeInput = document.getElementById("promoCodeInput");
-  const promoApplyBtn  = document.getElementById("promoApplyBtn");
-  const promoFeedback  = document.getElementById("promoFeedback");
+  const promoApplyBtn = document.getElementById("promoApplyBtn");
+  const promoFeedback = document.getElementById("promoFeedback");
   promoApplyBtn?.addEventListener("click", applyPromo);
   promoCodeInput?.addEventListener("keydown", (e) => {
     if (e.key === "Enter") applyPromo();
@@ -672,27 +691,30 @@ document.addEventListener("DOMContentLoaded", () => {
     const entered = promoCodeInput.value.trim().toUpperCase();
     if (!entered) {
       promoFeedback.textContent = "Please enter a promo code.";
-      promoFeedback.className   = "promo-feedback error";
+      promoFeedback.className = "promo-feedback error";
       return;
     }
     if (PROMO_CODES[entered] !== undefined) {
-      promoApplied  = true;
+      promoApplied = true;
       promoDiscount = PROMO_CODES[entered];
-      promoCode     = entered;
+      promoCode = entered;
       localStorage.setItem("hlc_promo", entered);
       const tierDisc = getTierDiscount(cartQty);
       let msg = `✓ ${entered} applied — ${Math.round(promoDiscount * 100)}% off!`;
       if (tierDisc > 0) msg += ` Combined with 15% tier discount.`;
       promoFeedback.textContent = msg;
-      promoFeedback.className   = "promo-feedback success";
-      promoCodeInput.value      = entered;
-      promoCodeInput.disabled   = true;
-      if (promoApplyBtn) { promoApplyBtn.textContent = "Applied"; promoApplyBtn.disabled = true; }
+      promoFeedback.className = "promo-feedback success";
+      promoCodeInput.value = entered;
+      promoCodeInput.disabled = true;
+      if (promoApplyBtn) {
+        promoApplyBtn.textContent = "Applied";
+        promoApplyBtn.disabled = true;
+      }
     } else {
-      promoApplied  = false;
+      promoApplied = false;
       promoDiscount = 0;
       promoFeedback.textContent = "Invalid code. Try NATURE10 or SAVE15.";
-      promoFeedback.className   = "promo-feedback error";
+      promoFeedback.className = "promo-feedback error";
     }
     updateCart();
   }
@@ -704,14 +726,20 @@ document.addEventListener("DOMContentLoaded", () => {
       'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])',
     );
     const first = focusable[0];
-    const last  = focusable[focusable.length - 1];
+    const last = focusable[focusable.length - 1];
     if (first) first.focus();
     modal._trapHandler = (e) => {
       if (e.key !== "Tab") return;
       if (e.shiftKey) {
-        if (document.activeElement === first) { e.preventDefault(); last?.focus(); }
+        if (document.activeElement === first) {
+          e.preventDefault();
+          last?.focus();
+        }
       } else {
-        if (document.activeElement === last)  { e.preventDefault(); first?.focus(); }
+        if (document.activeElement === last) {
+          e.preventDefault();
+          first?.focus();
+        }
       }
     };
     modal.addEventListener("keydown", modal._trapHandler);
@@ -722,35 +750,41 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* ── MODALS ──────────────────────────────────── */
-  const orderSuccess        = document.getElementById("orderSuccess");
+  const orderSuccess = document.getElementById("orderSuccess");
   const contactSuccessModal = document.getElementById("contactSuccess");
-  const reviewSuccessModal  = document.getElementById("reviewSuccess");
-  const modalReplyEmail     = document.getElementById("modalReplyEmail");
+  const reviewSuccessModal = document.getElementById("reviewSuccess");
+  const modalReplyEmail = document.getElementById("modalReplyEmail");
 
   /* ── CONFETTI ────────────────────────────────── */
   const confettiCanvas = document.getElementById("confettiCanvas");
-  const confettiCtx    = confettiCanvas?.getContext("2d");
+  const confettiCtx = confettiCanvas?.getContext("2d");
   const CONFETTI_COLORS = [
-    "#2a8c6e", "#c8a96e", "#3aad87", "#1a6b52", "#e4f5ee", "#d4b87a",
+    "#2a8c6e",
+    "#c8a96e",
+    "#3aad87",
+    "#1a6b52",
+    "#e4f5ee",
+    "#d4b87a",
   ];
 
   function launchConfetti() {
     if (!confettiCanvas || !confettiCtx || prefersReducedMotion) return;
     confettiCanvas.style.display = "block";
-    confettiCanvas.width  = window.innerWidth;
+    confettiCanvas.width = window.innerWidth;
     confettiCanvas.height = window.innerHeight;
 
     const particles = Array.from({ length: 55 }, () => ({
-      x:        confettiCanvas.width / 2 + (Math.random() - 0.5) * 200,
-      y:        confettiCanvas.height * 0.4,
-      vx:       (Math.random() - 0.5) * 8,
-      vy:       -(Math.random() * 7 + 4),
-      size:     Math.random() * 6 + 4,
-      color:    CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)],
+      x: confettiCanvas.width / 2 + (Math.random() - 0.5) * 200,
+      y: confettiCanvas.height * 0.4,
+      vx: (Math.random() - 0.5) * 8,
+      vy: -(Math.random() * 7 + 4),
+      size: Math.random() * 6 + 4,
+      color:
+        CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)],
       rotation: Math.random() * 360,
-      rotVel:   (Math.random() - 0.5) * 8,
-      opacity:  1,
-      shape:    Math.random() > 0.5 ? "rect" : "circle",
+      rotVel: (Math.random() - 0.5) * 8,
+      opacity: 1,
+      shape: Math.random() > 0.5 ? "rect" : "circle",
     }));
 
     let startTime = null;
@@ -762,8 +796,8 @@ document.addEventListener("DOMContentLoaded", () => {
       confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
 
       particles.forEach((p) => {
-        p.x  += p.vx;
-        p.y  += p.vy;
+        p.x += p.vx;
+        p.y += p.vy;
         p.vy += 0.22;
         p.rotation += p.rotVel;
         p.opacity = Math.max(0, 1 - (elapsed / DURATION) * 1.2);
@@ -786,7 +820,12 @@ document.addEventListener("DOMContentLoaded", () => {
       if (elapsed < DURATION) {
         requestAnimationFrame(drawConfetti);
       } else {
-        confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+        confettiCtx.clearRect(
+          0,
+          0,
+          confettiCanvas.width,
+          confettiCanvas.height,
+        );
         confettiCanvas.style.display = "none";
       }
     }
@@ -813,10 +852,12 @@ document.addEventListener("DOMContentLoaded", () => {
     orderSuccess?.classList.remove("show");
     releaseFocus(orderSuccess);
   });
-  document.getElementById("closeContactModal")?.addEventListener("click", () => {
-    contactSuccessModal?.classList.remove("show");
-    releaseFocus(contactSuccessModal);
-  });
+  document
+    .getElementById("closeContactModal")
+    ?.addEventListener("click", () => {
+      contactSuccessModal?.classList.remove("show");
+      releaseFocus(contactSuccessModal);
+    });
   document.getElementById("closeReviewModal")?.addEventListener("click", () => {
     reviewSuccessModal?.classList.remove("show");
     releaseFocus(reviewSuccessModal);
@@ -824,29 +865,42 @@ document.addEventListener("DOMContentLoaded", () => {
 
   [orderSuccess, contactSuccessModal, reviewSuccessModal].forEach((modal) => {
     modal?.addEventListener("click", (e) => {
-      if (e.target === modal) { modal.classList.remove("show"); releaseFocus(modal); }
+      if (e.target === modal) {
+        modal.classList.remove("show");
+        releaseFocus(modal);
+      }
     });
   });
 
   document.addEventListener("keydown", (e) => {
     if (e.key !== "Escape") return;
-    if (cartDrawer?.classList.contains("show")) { closeCart(); return; }
+    if (cartDrawer?.classList.contains("show")) {
+      closeCart();
+      return;
+    }
     const expandedCard = document.querySelector(".ingredient-card.expanded");
     if (expandedCard) {
       expandedCard.classList.remove("expanded");
-      expandedCard.querySelector(".ingredient-overlay")?.setAttribute("aria-expanded", "false");
-      expandedCard.querySelector(".ingredient-expand")?.setAttribute("aria-hidden", "true");
+      expandedCard
+        .querySelector(".ingredient-overlay")
+        ?.setAttribute("aria-expanded", "false");
+      expandedCard
+        .querySelector(".ingredient-expand")
+        ?.setAttribute("aria-hidden", "true");
       return;
     }
     [orderSuccess, contactSuccessModal, reviewSuccessModal].forEach((modal) => {
-      if (modal?.classList.contains("show")) { modal.classList.remove("show"); releaseFocus(modal); }
+      if (modal?.classList.contains("show")) {
+        modal.classList.remove("show");
+        releaseFocus(modal);
+      }
     });
   });
 
   /* ── CONTACT FORM ────────────────────────────── */
-  const contactForm     = document.getElementById("contactForm");
+  const contactForm = document.getElementById("contactForm");
   const formSubmitError = document.getElementById("formSubmitError");
-  const touchedFields   = new Set();
+  const touchedFields = new Set();
 
   function validateField(input, force = false) {
     if (!force && !touchedFields.has(input)) return true;
@@ -882,17 +936,17 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!fields.map((f) => validateField(f, true)).every(Boolean)) return;
     const btn = contactForm.querySelector("button[type=submit]");
     btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending…';
-    btn.disabled  = true;
+    btn.disabled = true;
     if (formSubmitError) {
       formSubmitError.textContent = "";
-      formSubmitError.className   = "form-submit-error";
+      formSubmitError.className = "form-submit-error";
     }
     const emailVal = contactForm.querySelector("#email")?.value?.trim();
     if (modalReplyEmail && emailVal) modalReplyEmail.textContent = emailVal;
     try {
       const res = await fetch(contactForm.action, {
-        method:  "POST",
-        body:    new FormData(contactForm),
+        method: "POST",
+        body: new FormData(contactForm),
         headers: { Accept: "application/json" },
       });
       if (res.ok) {
@@ -907,24 +961,26 @@ document.addEventListener("DOMContentLoaded", () => {
         }, 5000);
       } else {
         if (formSubmitError) {
-          formSubmitError.textContent = "Something went wrong. Please try again.";
-          formSubmitError.className   = "form-submit-error visible";
+          formSubmitError.textContent =
+            "Something went wrong. Please try again.";
+          formSubmitError.className = "form-submit-error visible";
         }
       }
     } catch {
       if (formSubmitError) {
-        formSubmitError.textContent = "Network error. Please check your connection and try again.";
-        formSubmitError.className   = "form-submit-error visible";
+        formSubmitError.textContent =
+          "Network error. Please check your connection and try again.";
+        formSubmitError.className = "form-submit-error visible";
       }
     } finally {
       btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Send Message';
-      btn.disabled  = false;
+      btn.disabled = false;
     }
   });
 
   /* ── NEWSLETTER ──────────────────────────────── */
   const newsletterForm = document.getElementById("newsletterForm");
-  const newsletterMsg  = document.getElementById("newsletterMsg");
+  const newsletterMsg = document.getElementById("newsletterMsg");
   newsletterForm?.addEventListener("submit", (e) => {
     e.preventDefault();
     const emailInput = document.getElementById("newsletterEmail");
@@ -934,20 +990,23 @@ document.addEventListener("DOMContentLoaded", () => {
     ) {
       if (newsletterMsg) {
         newsletterMsg.textContent = "Please enter a valid email.";
-        newsletterMsg.className   = "footer-newsletter-msg error";
+        newsletterMsg.className = "footer-newsletter-msg error";
       }
       return;
     }
     if (newsletterMsg) {
       newsletterMsg.textContent = "🌿 You're subscribed! Check your inbox.";
-      newsletterMsg.className   = "footer-newsletter-msg";
+      newsletterMsg.className = "footer-newsletter-msg";
     }
-    if (emailInput) { emailInput.value = ""; emailInput.disabled = true; }
+    if (emailInput) {
+      emailInput.value = "";
+      emailInput.disabled = true;
+    }
     newsletterForm.querySelector("button").disabled = true;
   });
 
   /* ── SHOW MORE REVIEWS ───────────────────────── */
-  const showMoreBtn   = document.getElementById("showMoreBtn");
+  const showMoreBtn = document.getElementById("showMoreBtn");
   const hiddenReviews = document.querySelectorAll(".hidden-review");
   let showingAll = false;
   showMoreBtn?.addEventListener("click", () => {
@@ -971,8 +1030,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /* ── REVIEW HELPFUL BUTTONS ──────────────────── */
   document.querySelectorAll(".review-helpful").forEach((btn) => {
-    const id      = btn.getAttribute("data-id");
-    const key     = `hlc_helpful_${id}`;
+    const id = btn.getAttribute("data-id");
+    const key = `hlc_helpful_${id}`;
     const countEl = btn.querySelector(".helpful-count");
     let voted = localStorage.getItem(key) === "1";
     if (voted) btn.classList.add("voted");
@@ -986,12 +1045,15 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   /* ── MOBILE REVIEW SNAP SCROLL DOTS ─────────── */
-  const reviewGrid       = document.getElementById("reviewGrid");
+  const reviewGrid = document.getElementById("reviewGrid");
   const reviewScrollDots = document.getElementById("reviewScrollDots");
 
   function initReviewDots() {
     if (!reviewGrid || !reviewScrollDots) return;
-    if (window.innerWidth > 768) { reviewScrollDots.innerHTML = ""; return; }
+    if (window.innerWidth > 768) {
+      reviewScrollDots.innerHTML = "";
+      return;
+    }
     const cards = [...reviewGrid.querySelectorAll(".review-card")];
     reviewScrollDots.innerHTML = "";
     cards.forEach((_, i) => {
@@ -1010,13 +1072,17 @@ document.addEventListener("DOMContentLoaded", () => {
     "scroll",
     () => {
       if (window.innerWidth > 768) return;
-      const cards      = [...reviewGrid.querySelectorAll(".review-card")];
-      const dots       = [...reviewScrollDots.querySelectorAll(".review-dot")];
+      const cards = [...reviewGrid.querySelectorAll(".review-card")];
+      const dots = [...reviewScrollDots.querySelectorAll(".review-dot")];
       const scrollLeft = reviewGrid.scrollLeft;
-      let closest = 0, minDist = Infinity;
+      let closest = 0,
+        minDist = Infinity;
       cards.forEach((card, i) => {
         const dist = Math.abs(card.offsetLeft - 20 - scrollLeft);
-        if (dist < minDist) { minDist = dist; closest = i; }
+        if (dist < minDist) {
+          minDist = dist;
+          closest = i;
+        }
       });
       dots.forEach((d, i) => d.classList.toggle("active", i === closest));
     },
@@ -1029,7 +1095,7 @@ document.addEventListener("DOMContentLoaded", () => {
   /* ── WRITE A REVIEW ──────────────────────────── */
   const writeReviewToggle = document.getElementById("writeReviewToggle");
   const writeReviewCancel = document.getElementById("writeReviewCancel");
-  const writeReviewForm   = document.getElementById("writeReviewForm");
+  const writeReviewForm = document.getElementById("writeReviewForm");
   let selectedRating = 0;
 
   writeReviewToggle?.addEventListener("click", () => {
@@ -1075,9 +1141,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   writeReviewForm?.addEventListener("submit", (e) => {
     e.preventDefault();
-    const name   = document.getElementById("wr-name")?.value.trim();
+    const name = document.getElementById("wr-name")?.value.trim();
     const rating = parseInt(document.getElementById("wr-rating")?.value || "0");
-    const text   = document.getElementById("wr-text")?.value.trim();
+    const text = document.getElementById("wr-text")?.value.trim();
     if (!name || !text || rating === 0) {
       if (rating === 0) {
         const picker = document.querySelector(".star-picker");
@@ -1088,11 +1154,12 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     const grid = document.querySelector(".review-grid");
     const card = document.createElement("div");
-    card.className    = "review-card";
+    card.className = "review-card";
     card.style.animation = "reviewFadeIn 0.5s ease forwards";
     const starsHtml = Array.from(
       { length: 5 },
-      (_, i) => `<i class="fa-${i < rating ? "solid" : "regular"} fa-star"></i>`,
+      (_, i) =>
+        `<i class="fa-${i < rating ? "solid" : "regular"} fa-star"></i>`,
     ).join("");
     const palettes = [
       { bg: "#e9f7f2", col: "#2f8f6d" },
@@ -1129,14 +1196,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /* ── INGREDIENT EXPAND PANELS ────────────────── */
   document.querySelectorAll(".ingredient-overlay").forEach((overlay) => {
-    const card     = overlay.closest(".ingredient-card");
+    const card = overlay.closest(".ingredient-card");
     const expandEl = card?.querySelector(".ingredient-expand");
     function toggleExpand() {
       const isOpen = card.classList.contains("expanded");
       document.querySelectorAll(".ingredient-card.expanded").forEach((c) => {
         c.classList.remove("expanded");
-        c.querySelector(".ingredient-overlay")?.setAttribute("aria-expanded", "false");
-        c.querySelector(".ingredient-expand")?.setAttribute("aria-hidden", "true");
+        c.querySelector(".ingredient-overlay")?.setAttribute(
+          "aria-expanded",
+          "false",
+        );
+        c.querySelector(".ingredient-expand")?.setAttribute(
+          "aria-hidden",
+          "true",
+        );
       });
       if (!isOpen) {
         card.classList.add("expanded");
@@ -1146,20 +1219,26 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     overlay.addEventListener("click", toggleExpand);
     overlay.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggleExpand(); }
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        toggleExpand();
+      }
     });
   });
 
   /* ── FAQ ─────────────────────────────────────── */
   document.querySelectorAll(".faq-q").forEach((btn) => {
     btn.addEventListener("click", () => {
-      const item   = btn.closest(".faq-item");
+      const item = btn.closest(".faq-item");
       const isOpen = item.classList.contains("open");
       document.querySelectorAll(".faq-item.open").forEach((el) => {
         el.classList.remove("open");
         el.querySelector(".faq-q")?.setAttribute("aria-expanded", "false");
       });
-      if (!isOpen) { item.classList.add("open"); btn.setAttribute("aria-expanded", "true"); }
+      if (!isOpen) {
+        item.classList.add("open");
+        btn.setAttribute("aria-expanded", "true");
+      }
     });
   });
 
@@ -1178,24 +1257,27 @@ document.addEventListener("DOMContentLoaded", () => {
       positionTooltip(e);
     }
     function hideTooltip() {
-      tooltipTimeout = setTimeout(() => tooltipBox.classList.remove("show"), 120);
+      tooltipTimeout = setTimeout(
+        () => tooltipBox.classList.remove("show"),
+        120,
+      );
     }
     function positionTooltip(e) {
       const rect = el.getBoundingClientRect();
       const boxW = 220;
-      let left   = rect.left + rect.width / 2 - boxW / 2;
+      let left = rect.left + rect.width / 2 - boxW / 2;
       left = Math.max(12, Math.min(left, window.innerWidth - boxW - 12));
-      const top  = rect.top - 8;
-      tooltipBox.style.left      = left + "px";
-      tooltipBox.style.top       = top + "px";
+      const top = rect.top - 8;
+      tooltipBox.style.left = left + "px";
+      tooltipBox.style.top = top + "px";
       tooltipBox.style.transform = `translateY(calc(-100% + ${tooltipBox.classList.contains("show") ? "0px" : "6px"}))`;
     }
 
     el.addEventListener("mouseenter", showTooltip);
     el.addEventListener("mouseleave", hideTooltip);
-    el.addEventListener("focus",      showTooltip);
-    el.addEventListener("blur",       hideTooltip);
-    el.addEventListener("mousemove",  positionTooltip);
+    el.addEventListener("focus", showTooltip);
+    el.addEventListener("blur", hideTooltip);
+    el.addEventListener("mousemove", positionTooltip);
   });
 
   /* ── INITIAL RENDER ──────────────────────────── */
@@ -1206,5 +1288,4 @@ document.addEventListener("DOMContentLoaded", () => {
     updateBenefitsSpotlight(window.scrollY);
     updateHeroParallax(window.scrollY);
   }
-
 }); // END DOMContentLoaded
