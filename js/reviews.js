@@ -244,10 +244,12 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  /* ── INGREDIENT EXPAND PANELS ────────────────── */
-  /* Key fix: use e.stopPropagation() + check e.currentTarget
-     so only the clicked card's overlay fires, not its siblings.
-     Also close all others before opening the clicked one. */
+  /* ══════════════════════════════════════════════
+     INGREDIENT EXPAND PANELS
+  ══════════════════════════════════════════════ */
+
+  const ingredientSection = document.getElementById("ingredients");
+
   function closeAllIngredients() {
     document.querySelectorAll(".ingredient-card.expanded").forEach((c) => {
       c.classList.remove("expanded");
@@ -262,42 +264,71 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  document.querySelectorAll(".ingredient-overlay").forEach((overlay) => {
+  function handleIngredientActivation(target) {
+    const overlay = target.closest(".ingredient-overlay");
+    if (!overlay) {
+      if (!target.closest(".ingredient-card")) closeAllIngredients();
+      return;
+    }
     const card = overlay.closest(".ingredient-card");
     const expandEl = card?.querySelector(".ingredient-expand");
+    if (!card) return;
 
-    function toggleExpand(e) {
-      /* Stop the click from bubbling up to document or sibling listeners */
-      e.stopPropagation();
+    const wasOpen = card.classList.contains("expanded");
+    closeAllIngredients();
 
-      const isOpen = card.classList.contains("expanded");
-
-      /* Always close all cards first */
-      closeAllIngredients();
-
-      /* If this card wasn't open, open it */
-      if (!isOpen) {
-        card.classList.add("expanded");
-        overlay.setAttribute("aria-expanded", "true");
-        expandEl?.setAttribute("aria-hidden", "false");
-      }
+    if (!wasOpen) {
+      card.classList.add("expanded");
+      overlay.setAttribute("aria-expanded", "true");
+      expandEl?.setAttribute("aria-hidden", "false");
     }
+  }
 
-    overlay.addEventListener("click", toggleExpand);
-    overlay.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        toggleExpand(e);
-      }
+  if (ingredientSection) {
+    let _lastTouchEnd = 0;
+    let _touchStartTarget = null;
+    let _touchDidScroll = false;
+
+    ingredientSection.addEventListener(
+      "touchstart",
+      (e) => {
+        _touchStartTarget = e.target;
+        _touchDidScroll = false;
+      },
+      { passive: true },
+    );
+
+    ingredientSection.addEventListener(
+      "touchmove",
+      () => {
+        _touchDidScroll = true;
+      },
+      { passive: true },
+    );
+
+    ingredientSection.addEventListener("touchend", (e) => {
+      if (_touchDidScroll) return;
+      if (!_touchStartTarget) return;
+      _lastTouchEnd = Date.now();
+      handleIngredientActivation(_touchStartTarget);
+      e.preventDefault();
+      _touchStartTarget = null;
     });
-  });
 
-  /* Clicking anywhere outside an ingredient card closes all */
-  document.addEventListener("click", (e) => {
-    if (!e.target.closest(".ingredient-card")) {
-      closeAllIngredients();
-    }
-  });
+    /* Desktop click — skip if a touchend just fired (within 350ms) */
+    ingredientSection.addEventListener("click", (e) => {
+      if (Date.now() - _lastTouchEnd < 350) return;
+      handleIngredientActivation(e.target);
+    });
+
+    ingredientSection.addEventListener("keydown", (e) => {
+      if (e.key !== "Enter" && e.key !== " ") return;
+      const overlay = e.target.closest(".ingredient-overlay");
+      if (!overlay) return;
+      e.preventDefault();
+      handleIngredientActivation(e.target);
+    });
+  }
 
   /* ── FAQ ─────────────────────────────────────── */
   document.querySelectorAll(".faq-q").forEach((btn) => {

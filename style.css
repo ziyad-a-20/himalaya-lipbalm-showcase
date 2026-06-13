@@ -12,15 +12,25 @@
   font-display: swap;
 }
 
-html.theme-transitioning *,
-html.theme-transitioning *::before,
-html.theme-transitioning *::after {
-  transition:
-    background-color 0.45s ease,
-    background 0.45s ease,
-    border-color 0.45s ease,
-    color 0.4s ease,
-    box-shadow 0.4s ease !important;
+/* ── SMOOTH THEME TRANSITION — OVERLAY METHOD ── */
+html::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  pointer-events: none;
+  background: var(--bg);
+  opacity: 0;
+  transition: none;
+  will-change: opacity;
+}
+html.theme-transitioning::before {
+  opacity: 1;
+  transition: opacity 0.22s ease;
+}
+html.theme-transitioning.theme-settled::before {
+  opacity: 0;
+  transition: opacity 0.28s ease;
 }
 
 /* ── DESIGN TOKENS — LIGHT ─────────────────────── */

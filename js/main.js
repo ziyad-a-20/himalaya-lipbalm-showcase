@@ -5,7 +5,6 @@
 
 window.HLC = window.HLC || {};
 
-/* ── PAGE LOADER ─────────────────────────────── */
 window.addEventListener("load", () => {
   const minDisplay = 1500;
   const loadStart = performance.now();
@@ -19,12 +18,10 @@ window.addEventListener("load", () => {
 });
 
 document.addEventListener("DOMContentLoaded", () => {
-  /* ── REDUCED MOTION ────────────────────────── */
   const prefersReducedMotion = window.matchMedia(
     "(prefers-reduced-motion: reduce)",
   ).matches;
 
-  /* ── AOS ───────────────────────────────────── */
   AOS.init({
     duration: prefersReducedMotion ? 0 : 850,
     easing: "ease-out-cubic",
@@ -33,12 +30,10 @@ document.addEventListener("DOMContentLoaded", () => {
     anchorPlacement: "top-bottom",
   });
 
-  /* ── DARK MODE ─────────────────────────────── */
   const themeToggle = document.getElementById("themeToggle");
   const themeIcon = document.getElementById("themeIcon");
   const html = document.documentElement;
 
-  /* Apply saved theme immediately to avoid flash */
   const savedTheme = localStorage.getItem("hlc_theme") || "light";
   html.setAttribute("data-theme", savedTheme);
   updateThemeIcon(savedTheme);
@@ -52,21 +47,30 @@ document.addEventListener("DOMContentLoaded", () => {
   themeToggle?.addEventListener("click", () => {
     const next = html.getAttribute("data-theme") === "dark" ? "light" : "dark";
 
-    /* Add the transition class, swap the theme, then remove the class
-       after the transition duration so it never fights other transitions */
+    /* Phase 1 — fade overlay IN (covers the page) */
     html.classList.add("theme-transitioning");
-    html.setAttribute("data-theme", next);
-    localStorage.setItem("hlc_theme", next);
-    updateThemeIcon(next);
-    setTimeout(() => html.classList.remove("theme-transitioning"), 500);
+
+    /* Phase 2 — swap theme while hidden, then fade OUT */
+    setTimeout(() => {
+      html.setAttribute("data-theme", next);
+      localStorage.setItem("hlc_theme", next);
+      updateThemeIcon(next);
+
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          html.classList.add("theme-settled");
+          setTimeout(() => {
+            html.classList.remove("theme-transitioning", "theme-settled");
+          }, 300);
+        });
+      });
+    }, 230);
   });
 
-  /* ── PROMO BANNER CLOSE ────────────────────── */
   document.getElementById("promoClose")?.addEventListener("click", () => {
     document.getElementById("promoBanner")?.classList.add("hidden");
   });
 
-  /* ── TIME-BASED GREETING ───────────────────── */
   (function insertGreeting() {
     const hour = new Date().getHours();
     let emoji, text;
@@ -84,12 +88,10 @@ document.addEventListener("DOMContentLoaded", () => {
       text = "Good night";
     }
     const eyebrow = document.querySelector(".hero-eyebrow span");
-    if (eyebrow) {
+    if (eyebrow)
       eyebrow.textContent = `${emoji} ${text} — Dermatologically Tested`;
-    }
   })();
 
-  /* ── INITIAL SCROLL-DRIVEN STATE ──────────── */
   if (!prefersReducedMotion) {
     window.HLC.updateAboutScale?.();
     window.HLC.updateBenefitsSpotlight?.();
