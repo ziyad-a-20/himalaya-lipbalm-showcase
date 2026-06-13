@@ -12,6 +12,17 @@
   font-display: swap;
 }
 
+html.theme-transitioning *,
+html.theme-transitioning *::before,
+html.theme-transitioning *::after {
+  transition:
+    background-color 0.45s ease,
+    background 0.45s ease,
+    border-color 0.45s ease,
+    color 0.4s ease,
+    box-shadow 0.4s ease !important;
+}
+
 /* ── DESIGN TOKENS — LIGHT ─────────────────────── */
 :root {
   --green: #2a8c6e;
@@ -4002,6 +4013,56 @@ tr[data-aos] {
     line-height: 32px;
     font-size: 13px;
   }
+}
+
+/* ── INGREDIENT MOBILE SNAP SCROLL ─────────── */
+@media (max-width: 640px) {
+  .ingredient-grid {
+    display: flex;
+    flex-direction: row;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    gap: 14px;
+    padding-bottom: 12px;
+    margin-left: -20px;
+    margin-right: -20px;
+    padding-left: 20px;
+    padding-right: 20px;
+    scrollbar-width: none;
+    align-items: unset;
+  }
+  .ingredient-grid::-webkit-scrollbar { display: none; }
+  .ingredient-card {
+    flex: 0 0 78vw;
+    max-width: 300px;
+    scroll-snap-align: start;
+  }
+}
+
+.ingredient-scroll-dots {
+  display: none;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 16px;
+  margin-bottom: 4px;
+}
+@media (max-width: 640px) {
+  .ingredient-scroll-dots { display: flex; }
+}
+.ingredient-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--border);
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.3s ease, width 0.3s ease;
+}
+.ingredient-dot.active {
+  background: var(--green);
+  width: 18px;
+  border-radius: 3px;
 }
 
 /* ══════════════════════════════════════════════════
